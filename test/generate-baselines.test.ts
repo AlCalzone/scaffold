@@ -220,19 +220,18 @@ describe("adapter creation =>", () => {
 			// });
 		});
 
-		// describe("Single-file component tests =>", () => {
-		// 	it("Valid description", async () => {
-		// 		const answers: Answers = {
-		// 			...baseAnswers,
-		// 			description: "This is a short description",
-		// 		};
-		// 		await expectSuccess(
-		// 			"description_valid",
-		// 			answers,
-		// 			(file) => file.name === "io-package.json",
-		// 		);
-		// 	});
-
-		// });
+		describe("Single-file component tests =>", () => {
+			it("Node.js 12", async () => {
+				const answers: Answers = {
+					...baseAnswers,
+					nodeVersion: 12,
+				};
+				await expectSuccess(
+					"node12",
+					answers,
+					(file) => file.name === "package.json",
+				);
+			});
+		});
 	});
 });

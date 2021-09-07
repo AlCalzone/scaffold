@@ -22,7 +22,7 @@ const templateFunction: TemplateFunction = async answers => {
 	const useTypeScript = true; //answers.language === "TypeScript";
 	if (!answers.monorepo) return;
 
-	const packageName=answers.monorepoPackageName!;
+	const packageName = answers.monorepoPackageName!;
 
 	const dependencyTasks: string[] = [];
 	const dependencies = await getDependencyEntries(dependencyTasks)
@@ -30,6 +30,12 @@ const templateFunction: TemplateFunction = async answers => {
 	const devDependencyTasks: string[] = [];
 	const devDependencies = await getDependencyEntries(devDependencyTasks);
 	
+	const engines = {
+		12: ">=12.20",
+		14: ">=14",
+		16: ">=16",
+	} as const;
+
 	const gitUrl =
 		answers.gitRemoteProtocol === "HTTPS"
 			? `https://github.com/${answers.authorGithub}/${answers.projectName}`
@@ -71,8 +77,23 @@ const templateFunction: TemplateFunction = async answers => {
 		"email": "${answers.authorEmail}",
 	},
 	"main": "build/index.js",
+	"exports": {
+		".": "./build/index.js",
+		"./package.json": "./package.json",
+		"./*.map": "./build/*.js.map",
+		"./*": "./build/*.js"
+	},
 	"types": "build/index.d.ts",
+	"typesVersions": {
+		"*": {
+			"build/index.d.ts": ["build/index.d.ts"],
+			"*": ["build/*"]
+		}
+	},
 	"files": ${JSON.stringify(packageFiles)},
+	"engines": {
+		"node": "${engines[answers.nodeVersion]}"
+	},
 	"dependencies": {${dependencies.join(",")}},
 	"devDependencies": {${devDependencies.join(",")}},
 	"scripts": {
