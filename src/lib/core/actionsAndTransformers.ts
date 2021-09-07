@@ -1,7 +1,7 @@
-import { yellow } from "ansi-colors";
 import type { Answers } from "./questions";
 
-const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const emailRegex =
+	/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export type CheckResult = true | string;
 export async function checkMinSelections(
@@ -30,27 +30,9 @@ function isAdapterNameValid(name: string): CheckResult {
 	return true;
 }
 
-export async function checkAdapterName<
-	T extends { checkAdapterExistence?: (name: string) => Promise<CheckResult> }
->(name: string, options?: T): Promise<CheckResult> {
+export function checkAdapterName(name: string): CheckResult {
 	const validCheck = isAdapterNameValid(name);
 	if (typeof validCheck === "string") return validCheck;
-
-	if (options && options.checkAdapterExistence) {
-		const existenceCheck = await options.checkAdapterExistence(name);
-		if (typeof existenceCheck === "string") return existenceCheck;
-	}
-
-	return true;
-}
-
-export function checkTitle(title?: string): CheckResult {
-	if (!isNotEmpty(title)) {
-		return "Please enter a title!";
-	}
-	if (/iobroker|adapter/i.test(title)) {
-		return `The title must not contain the words "ioBroker" or "adapter"!`;
-	}
 	return true;
 }
 
@@ -79,17 +61,6 @@ export async function checkTypeScriptTools(
 		return "ESLint must be selected to use Prettier!";
 	}
 	return true;
-}
-
-export function transformAdapterName(name: string): string {
-	const startsWithIoBroker = /^ioBroker\./i;
-	if (startsWithIoBroker.test(name)) {
-		name = name.replace(startsWithIoBroker, "");
-		console.log(
-			yellow(`You don't have to prefix the name with "ioBroker."`),
-		);
-	}
-	return name;
 }
 
 export function transformDescription(description: string): string | undefined {

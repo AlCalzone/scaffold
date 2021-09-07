@@ -7,23 +7,16 @@ import {
 	checkEmail,
 	checkMinSelections,
 	CheckResult,
-	checkTitle,
 	checkTypeScriptTools,
-	transformAdapterName,
 	transformContributors,
 	transformDescription,
 	transformKeywords,
 } from "./actionsAndTransformers";
-import { licenses } from "./licenses";
-import type { MigrationContextBase } from "./migrationContextBase";
 
 // This is being used to simulate wrong options for conditions on the type level
 const __misused: unique symbol = Symbol.for("__misused");
 
-type QuestionAction<T> = (
-	value: T,
-	options?: unknown,
-) => CheckResult | Promise<CheckResult>;
+type QuestionAction<T> = (value: T) => CheckResult | Promise<CheckResult>;
 export type AnswerValue = string | boolean | number;
 export type Condition = { name: string } & (
 	| { value: AnswerValue | AnswerValue[] }
@@ -65,16 +58,6 @@ export function testCondition(
 	}
 }
 
-export type MigrateFunc = (
-	context: MigrationContextBase,
-	answers: Record<string, any>,
-	question: Question,
-) =>
-	| Promise<AnswerValue | AnswerValue[] | undefined>
-	| AnswerValue
-	| AnswerValue[]
-	| undefined;
-
 export type TransformResult = (
 	val: AnswerValue | AnswerValue[],
 ) =>
@@ -87,7 +70,6 @@ export interface QuestionMeta {
 	label: string;
 	/** One or more conditions that need(s) to be fulfilled for this question to be asked */
 	condition?: Condition | Condition[];
-	migrate?: MigrateFunc;
 	resultTransform?: TransformResult;
 	action?: QuestionAction<undefined | AnswerValue | AnswerValue[]>;
 	/** Whether an answer for this question is optional */
@@ -109,7 +91,7 @@ export interface QuestionGroup {
 function styledMultiselect<
 	T extends Pick<Question, Exclude<keyof Question, "type">> & {
 		choices: any[];
-	}
+	},
 >(ms: T): T & { type: "multiselect" } {
 	return Object.assign({} as Question, ms, {
 		type: "multiselect" as const,
@@ -134,19 +116,7 @@ export const questionGroups: QuestionGroup[] = [
 				name: "adapterName",
 				label: "Adapter Name",
 				message: "Please enter the name of your project:",
-				resultTransform: transformAdapterName,
 				action: checkAdapterName,
-				migrate: (ctx) => ctx.ioPackageJson.common?.name,
-			},
-			{
-				type: "input",
-				name: "title",
-				label: "Title",
-				message: "Which title should be shown in the admin UI?",
-				action: checkTitle,
-				migrate: (ctx) =>
-					ctx.ioPackageJson.common?.titleLang?.en ||
-					ctx.ioPackageJson.common?.title,
 			},
 			{
 				type: "input",
@@ -156,9 +126,6 @@ export const questionGroups: QuestionGroup[] = [
 				hint: "(optional)",
 				optional: true,
 				resultTransform: transformDescription,
-				migrate: (ctx) =>
-					ctx.ioPackageJson.common?.desc?.en ||
-					ctx.ioPackageJson.common?.desc,
 			},
 			{
 				type: "input",
@@ -169,12 +136,6 @@ export const questionGroups: QuestionGroup[] = [
 				hint: "(optional)",
 				optional: true,
 				resultTransform: transformKeywords,
-				migrate: (ctx) =>
-					(
-						ctx.ioPackageJson.common?.keywords ||
-						ctx.packageJson.common?.keywords ||
-						[]
-					).join(","),
 			},
 			{
 				type: "input",
@@ -185,11 +146,6 @@ export const questionGroups: QuestionGroup[] = [
 				hint: "(optional)",
 				optional: true,
 				resultTransform: transformContributors,
-				migrate: (ctx) =>
-					(ctx.packageJson.contributors || [])
-						.map((c: Record<string, string>) => c.name)
-						.filter((name: string) => !!name)
-						.join(","),
 			},
 			{
 				condition: { name: "cli", value: false },
@@ -219,7 +175,6 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "I want to specify everything!", value: "yes" },
 				],
 				optional: true,
-				migrate: () => "yes", // always force expert mode for migrate
 			},
 			styledMultiselect({
 				name: "features",
@@ -231,11 +186,6 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "Visualization", value: "vis" },
 				],
 				action: checkMinSelections.bind(undefined, "feature", 1),
-				migrate: async (ctx) =>
-					[
-						(await ctx.directoryExists("admin")) ? "adapter" : null,
-						(await ctx.directoryExists("widgets")) ? "vis" : null,
-					].filter((f) => !!f) as string[],
 			}),
 			styledMultiselect({
 				condition: { name: "features", contains: "adapter" },
@@ -250,17 +200,6 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "An extra tab", value: "tab" },
 					{ message: "Custom options for states", value: "custom" },
 				],
-				migrate: async (ctx) =>
-					[
-						(await ctx.fileExists("admin/tab.html")) ||
-						(await ctx.fileExists("admin/tab_m.html"))
-							? "tab"
-							: null,
-						(await ctx.fileExists("admin/custom.html")) ||
-						(await ctx.fileExists("admin/custom_m.html"))
-							? "custom"
-							: null,
-					].filter((f) => !!f) as string[],
 			}),
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -395,7 +334,6 @@ export const questionGroups: QuestionGroup[] = [
 						value: "weather",
 					},
 				],
-				migrate: (ctx) => ctx.ioPackageJson.common?.type,
 			},
 			{
 				condition: { name: "features", contains: "vis" },
@@ -407,7 +345,6 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "Icons for VIS", value: "visualization-icons" },
 					{ message: "VIS widgets", value: "visualization-widgets" },
 				],
-				migrate: (ctx) => ctx.ioPackageJson.common?.type,
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -434,7 +371,6 @@ export const questionGroups: QuestionGroup[] = [
 					},
 					{ message: "never", value: "none" },
 				],
-				migrate: (ctx) => ctx.ioPackageJson.common?.mode,
 			},
 			{
 				condition: { name: "startMode", value: "schedule" },
@@ -446,8 +382,6 @@ export const questionGroups: QuestionGroup[] = [
 					"Should the adapter also be started when the configuration is changed?",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: (ctx) =>
-					ctx.ioPackageJson.common?.allowInit ? "yes" : "no",
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -463,7 +397,6 @@ export const questionGroups: QuestionGroup[] = [
 						value: "local",
 					},
 				],
-				migrate: (ctx) => ctx.ioPackageJson.common?.connectionType,
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -489,7 +422,6 @@ export const questionGroups: QuestionGroup[] = [
 						value: "assumption",
 					},
 				],
-				migrate: (ctx) => ctx.ioPackageJson.common?.dataSource,
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -501,12 +433,6 @@ export const questionGroups: QuestionGroup[] = [
 				hint: "(To some device or some service)",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: (ctx) =>
-					ctx.ioPackageJson.instanceObjects?.some(
-						(o: any) => o._id === "info.connection",
-					)
-						? "yes"
-						: "no",
 			},
 		],
 	},
@@ -540,14 +466,6 @@ export const questionGroups: QuestionGroup[] = [
 				message:
 					"Which language do you want to use to code the adapter?",
 				choices: ["JavaScript", "TypeScript"],
-				migrate: async (ctx) =>
-					(await ctx.hasFilesWithExtension(
-						"src",
-						".ts",
-						(f) => !f.endsWith(".d.ts"),
-					))
-						? "TypeScript"
-						: "JavaScript",
 			},
 			{
 				condition: [{ name: "features", contains: "adapter" }],
@@ -557,19 +475,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Use React for the Admin UI?",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: async (ctx) =>
-					(await ctx.hasFilesWithExtension(
-						"admin/src",
-						".jsx",
-						(f) => !f.endsWith("tab.jsx"),
-					)) ||
-					(await ctx.hasFilesWithExtension(
-						"admin/src",
-						".tsx",
-						(f) => !f.endsWith("tab.tsx"),
-					))
-						? "yes"
-						: "no",
 			},
 			{
 				condition: [{ name: "adminFeatures", contains: "tab" }],
@@ -579,11 +484,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Use React for the tab UI?",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: async (ctx) =>
-					(await ctx.fileExists("admin/src/tab.jsx")) ||
-					(await ctx.fileExists("admin/src/tab.tsx"))
-						? "yes"
-						: "no",
 			},
 			styledMultiselect({
 				condition: { name: "language", value: "JavaScript" },
@@ -596,20 +496,9 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "type checking", hint: "(recommended)" },
 					{
 						message: "devcontainer",
-						hint:
-							"(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
+						hint: "(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
 					},
 				],
-				migrate: async (ctx) =>
-					[
-						ctx.hasDevDependency("eslint") ? "ESLint" : null,
-						ctx.hasDevDependency("typescript")
-							? "type checking"
-							: null,
-						(await ctx.directoryExists(".devcontainer"))
-							? "devcontainer"
-							: null,
-					].filter((f) => !!f) as string[],
 			}),
 			styledMultiselect({
 				condition: { name: "language", value: "TypeScript" },
@@ -621,26 +510,15 @@ export const questionGroups: QuestionGroup[] = [
 					{ message: "ESLint", hint: "(recommended)" },
 					{
 						message: "Prettier",
-						hint:
-							"(requires ESLint, enables automatic code formatting in VSCode)",
+						hint: "(requires ESLint, enables automatic code formatting in VSCode)",
 					},
 					{ message: "code coverage" },
 					{
 						message: "devcontainer",
-						hint:
-							"(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
+						hint: "(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
 					},
 				],
 				action: checkTypeScriptTools,
-				migrate: async (ctx) =>
-					[
-						ctx.hasDevDependency("eslint") ? "ESLint" : null,
-						ctx.hasDevDependency("prettier") ? "Prettier" : null,
-						ctx.hasDevDependency("nyc") ? "code coverage" : null,
-						(await ctx.directoryExists(".devcontainer"))
-							? "devcontainer"
-							: null,
-					].filter((f) => !!f) as string[],
 			}),
 			{
 				type: "select",
@@ -650,10 +528,6 @@ export const questionGroups: QuestionGroup[] = [
 					"Would you like to automate new releases with one simple command?",
 				initial: "yes",
 				choices: ["yes", "no"],
-				migrate: async (ctx) =>
-					ctx.hasDevDependency("@alcalzone/release-script")
-						? "yes"
-						: "no",
 			},
 			{
 				condition: [
@@ -668,7 +542,6 @@ export const questionGroups: QuestionGroup[] = [
 					"Would you like to use dev-server to develop and test your code with a simple command line tool?",
 				initial: "yes",
 				choices: ["yes", "no"],
-				migrate: () => "yes",
 			},
 			{
 				condition: { name: "devServer", contains: "yes" },
@@ -680,7 +553,6 @@ export const questionGroups: QuestionGroup[] = [
 				initial: 8081,
 				min: 1024,
 				max: 0xffff,
-				migrate: () => 8081,
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -690,8 +562,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Do you prefer tab or space indentation?",
 				initial: "Tab",
 				choices: ["Tab", "Space (4)"],
-				migrate: async (ctx) =>
-					(await ctx.analyzeCode("\t", "  ")) ? "Tab" : "Space (4)",
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -701,8 +571,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Do you prefer double or single quotes?",
 				initial: "double",
 				choices: ["double", "single"],
-				migrate: async (ctx) =>
-					(await ctx.analyzeCode('"', "'")) ? "double" : "single",
 			},
 			{
 				condition: { name: "features", contains: "adapter" },
@@ -724,10 +592,6 @@ export const questionGroups: QuestionGroup[] = [
 						value: "no",
 					},
 				],
-				migrate: async (ctx) =>
-					(await ctx.getMainFileContent()).match(/^[ \t]*class/gm)
-						? "yes"
-						: "no",
 			},
 		],
 	},
@@ -741,7 +605,6 @@ export const questionGroups: QuestionGroup[] = [
 				label: "Author Name",
 				message: "Please enter your name (or nickname):",
 				action: checkAuthorName,
-				migrate: (ctx) => ctx.packageJson.author?.name,
 			},
 			{
 				type: "input",
@@ -750,11 +613,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "What's your name/org on GitHub?",
 				initial: ((answers: Answers) => answers.authorName) as any,
 				action: checkAuthorName,
-				migrate: (ctx) =>
-					ctx.ioPackageJson.common?.extIcon?.replace(
-						/^\w+:\/\/[^\/]+\.com\/([^\/]+)\/.+$/,
-						"$1",
-					),
 			},
 			{
 				type: "input",
@@ -762,7 +620,6 @@ export const questionGroups: QuestionGroup[] = [
 				label: "Adapter E-Mail",
 				message: "What's your email address?",
 				action: checkEmail,
-				migrate: (ctx) => ctx.packageJson.author?.email,
 			},
 			{
 				type: "select",
@@ -780,10 +637,6 @@ export const questionGroups: QuestionGroup[] = [
 						hint: "(requires you to setup SSH keys)",
 					},
 				],
-				migrate: (ctx) =>
-					ctx.packageJson.repository?.url?.match(/^git@/)
-						? "SSH"
-						: "HTTPS",
 			},
 			{
 				condition: { name: "cli", value: true },
@@ -794,7 +647,6 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Initialize the GitHub repo automatically?",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: () => "no",
 			},
 			{
 				type: "select",
@@ -812,10 +664,6 @@ export const questionGroups: QuestionGroup[] = [
 					"MIT License",
 					"The Unlicense",
 				],
-				migrate: (ctx) =>
-					Object.keys(licenses).find(
-						(k) => licenses[k].id === ctx.packageJson.license,
-					),
 			},
 			{
 				type: "select",
@@ -827,10 +675,6 @@ export const questionGroups: QuestionGroup[] = [
 				hint: "(recommended)",
 				initial: "no",
 				choices: ["yes", "no"],
-				migrate: async (ctx) =>
-					(await ctx.fileExists(".github/dependabot.yml"))
-						? "yes"
-						: "no",
 			},
 		],
 	},

@@ -4,9 +4,9 @@ import {
 	formatAnswers,
 	validateAnswers,
 } from "./lib/core/questions";
-import { createFiles, File } from "./lib/createAdapter";
+import { createFiles, File } from "./lib/projectGen";
 
-export async function createAdapter(
+export async function projectGen(
 	answers: Answers,
 	disableValidation: (keyof Answers)[] = [],
 ): Promise<File[]> {

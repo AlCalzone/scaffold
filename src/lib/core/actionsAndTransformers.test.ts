@@ -6,8 +6,6 @@ import {
 	checkEmail,
 	checkMinSelections,
 	CheckResult,
-	checkTitle,
-	transformAdapterName,
 	transformDescription,
 } from "./actionsAndTransformers";
 
@@ -65,27 +63,8 @@ describe("actionsAndTransformers/checkAdapterName()", () => {
 		}
 	});
 
-	it("should return an error if the adapter already exists", async () => {
-		checkAdapterExistence.resolves(
-			"The adapter ioBroker.foo already exists!",
-		);
-		const result = await checkAdapterName("foo", {
-			checkAdapterExistence,
-		});
-		result.should.be.a("string").and.match(/already exists/);
-	});
-
-	it("should not return an error if the check is skipped", async () => {
-		await checkAdapterName("foo", {
-			checkAdapterExistence: undefined,
-		}).should.become(true);
-	});
-
 	it("should return true otherwise", async () => {
-		checkAdapterExistence.resolves(true);
-		await checkAdapterName("foo", {
-			checkAdapterExistence,
-		}).should.become(true);
+		await checkAdapterName("foo").should.become(true);
 	});
 });
 
@@ -112,21 +91,6 @@ describe("actionsAndTransformers/checkEmail()", () => {
 	});
 	it("should return true for valid email addresses", async () => {
 		await checkEmail("test.user@fake-mail.com").should.become(true);
-	});
-});
-
-describe("actionsAndTransformers/transformAdapterName()", () => {
-	it(`should remove leading "ioBroker." from the adapter name`, () => {
-		const tests = [
-			{ original: "ioBroker.test-adapter", expected: "test-adapter" },
-			{ original: "iobroker.test-adapter", expected: "test-adapter" },
-			{ original: "ioBrokertest", expected: "ioBrokertest" },
-			{ original: "iobrokertest", expected: "iobrokertest" },
-		];
-
-		for (const { original, expected } of tests) {
-			transformAdapterName(original).should.equal(expected);
-		}
 	});
 });
 
@@ -157,31 +121,5 @@ describe("actionsAndTransformers/transformDescription()", () => {
 		for (const { original, expected } of tests) {
 			expect(transformDescription(original)).to.equal(expected);
 		}
-	});
-});
-
-describe("actionsAndTransformers/checkTitle()", () => {
-	it("should not accept empty titles", async () => {
-		const forbidden = ["", " ", "\t"];
-		for (const name of forbidden) {
-			const result = await checkTitle(name);
-			result.should.be.a("string").and.match(/Please enter/);
-		}
-	});
-
-	it("should return an error if the title contains iobroker or adapter", async () => {
-		const forbidden = [
-			"iobroker adapter",
-			"adapter test foo",
-			"this is for iobroker",
-		];
-		for (const name of forbidden) {
-			const result = await checkTitle(name);
-			result.should.be.a("string").and.match(/must not/);
-		}
-	});
-
-	it("should return true otherwise", async () => {
-		checkTitle("foo").should.equal(true);
 	});
 });

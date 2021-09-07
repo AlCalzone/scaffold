@@ -1,4 +1,4 @@
-import type { TemplateFunction } from "../../src/lib/createAdapter";
+import type { TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
@@ -14,7 +14,7 @@ updates:
     interval: monthly
     time: "04:00"
     timezone: Europe/Berlin
-  open-pull-requests-limit: 20
+  open-pull-requests-limit: 5
   assignees:
   - ${answers.authorGithub}
   versioning-strategy: increase

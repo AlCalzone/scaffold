@@ -3,8 +3,6 @@ import { prompt } from "enquirer";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as yargs from "yargs";
-import type { CheckResult } from "./lib/core/actionsAndTransformers";
-import type { MigrationContextBase } from "./lib/core/migrationContextBase";
 import {
 	Answers,
 	Question,
@@ -12,9 +10,7 @@ import {
 	questionGroups,
 	testCondition,
 } from "./lib/core/questions";
-import { createFiles, File, writeFiles } from "./lib/createAdapter";
-import { LocalMigrationContext } from "./lib/localMigrationContext";
-import { fetchPackageVersion } from "./lib/packageVersions";
+import { createFiles, File, writeFiles } from "./lib/projectGen";
 import { error, executeCommand, getOwnVersion, isWindows } from "./lib/tools";
 
 export type ConditionalTitle = (
@@ -23,35 +19,21 @@ export type ConditionalTitle = (
 
 /** Define command line arguments */
 const argv = yargs
-	.env("CREATE_ADAPTER")
+	.env("PROJECT_GEN")
 	.strict()
-	.usage("ioBroker adapter creator\n\nUsage: $0 [options]")
+	.usage("Node.js project generator\n\nUsage: $0 [options]")
 	.alias("h", "help")
 	.alias("v", "version")
 	.options({
 		target: {
 			alias: "t",
 			type: "string",
-			desc:
-				"Output directory for adapter files\n(default: current directory)",
-		},
-		skipAdapterExistenceCheck: {
-			alias: "x",
-			type: "boolean",
-			default: false,
-			desc:
-				"Skip check if an adapter with the same name already exists on npm",
+			desc: "Output directory for generated files\n(default: current directory)",
 		},
 		replay: {
 			alias: "r",
 			type: "string",
-			desc: "Replay answers from the given .create-adapter.json file",
-		},
-		migrate: {
-			alias: "m",
-			type: "string",
-			desc:
-				"Use answers from an existing adapter directory (must be the base directory of an adapter where you find io-package.json)",
+			desc: "Replay answers from the given .project-gen.json file",
 		},
 		noInstall: {
 			alias: "n",
@@ -72,26 +54,9 @@ const argv = yargs
 /** Where the output should be written */
 const rootDir = path.resolve(argv.target || process.cwd());
 
-async function checkAdapterExistence(name: string): Promise<CheckResult> {
-	try {
-		await fetchPackageVersion(`iobroker.${name}`);
-		return `The adapter ioBroker.${name} already exists!`;
-	} catch (e) {
-		return true;
-	}
-}
-
-const creatorOptions = {
-	checkAdapterExistence:
-		!argv.skipAdapterExistenceCheck && !argv.migrate
-			? checkAdapterExistence
-			: undefined,
-};
-
 /** Asks a series of questions on the CLI */
 async function ask(): Promise<Answers> {
 	let answers: Record<string, any> = { cli: true };
-	let migrationContext: MigrationContextBase | undefined;
 
 	if (!!argv.replay) {
 		const replayFile = path.resolve(argv.replay);
@@ -100,39 +65,11 @@ async function ask(): Promise<Answers> {
 		answers.replay = replayFile;
 	}
 
-	if (!!argv.migrate) {
-		try {
-			const migrationDir = path.resolve(argv.migrate);
-			const ctx = new LocalMigrationContext(migrationDir);
-			console.log(`Migrating from ${migrationDir}`);
-			await ctx.load();
-			migrationContext = ctx;
-		} catch (error) {
-			console.error(error);
-			throw new Error(
-				"Please ensure that --migrate points to a valid adapter directory",
-			);
-		}
-		if (await migrationContext.fileExists(".create-adapter.json")) {
-			// it's just not worth trying to figure out things if the adapter was already created with create-adapter
-			throw new Error(
-				"Use --replay instead of --migrate for an adapter created with a recent version of create-adapter.",
-			);
-		}
-	}
-
 	async function askQuestion(q: Question): Promise<void> {
 		if (testCondition(q.condition, answers)) {
 			// Make properties dependent on previous answers
 			if (typeof q.initial === "function") {
 				q.initial = q.initial(answers);
-			}
-			if (migrationContext && q.migrate) {
-				let migrated = q.migrate(migrationContext, answers, q);
-				if (migrated instanceof Promise) {
-					migrated = await migrated;
-				}
-				q.initial = migrated;
 			}
 			while (true) {
 				let answer: Record<string, any>;
@@ -176,7 +113,6 @@ async function ask(): Promise<Answers> {
 					if (q.action != undefined) {
 						const testResult = await q.action(
 							answer[q.name as string],
-							creatorOptions,
 						);
 						if (typeof testResult === "string") {
 							error(testResult);

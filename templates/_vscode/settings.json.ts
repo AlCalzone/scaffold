@@ -1,5 +1,5 @@
 import * as JSON5 from "json5";
-import type { TemplateFunction } from "../../src/lib/createAdapter";
+import type { TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
@@ -24,12 +24,6 @@ ${usePrettier ? (`
 	},
 	`) : ""}
 `) : ""}
-	"json.schemas": [
-		{
-			"fileMatch": ["io-package.json"],
-			"url": "https://json.schemastore.org/io-package"
-		}
-	],
 }
 `;
 return JSON.stringify(JSON5.parse(template), null, 4);

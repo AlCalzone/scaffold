@@ -1,9 +1,9 @@
-import type { TemplateFunction } from "../src/lib/createAdapter";
+import type { TemplateFunction } from "../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
 	return JSON.stringify(answers, undefined, '\t');
 };
 
-templateFunction.customPath = ".create-adapter.json";
+templateFunction.customPath = ".project-gen.json";
 export = templateFunction;

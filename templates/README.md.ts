@@ -1,5 +1,5 @@
 import { getIconName } from "../src/lib/core/questions";
-import type { TemplateFunction } from "../src/lib/createAdapter";
+import type { TemplateFunction } from "../src/lib/projectGen";
 import { getFormattedLicense } from "../src/lib/tools";
 
 export = (answers => {

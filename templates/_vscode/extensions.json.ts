@@ -1,19 +1,22 @@
 import * as JSON5 from "json5";
-import type { TemplateFunction } from "../../src/lib/createAdapter";
+import type { TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
-	const useESLint = answers.tools && answers.tools.indexOf("ESLint") > -1;
-	const usePrettier = answers.tools && answers.tools.indexOf("Prettier") > -1;
+	const useESLint = !!answers.tools?.includes("ESLint");
+	const usePrettier = !!answers.tools?.includes("Prettier");
 
-	if (!useESLint && !usePrettier) return;
+	const recommendations = [
+		...(useESLint ? ["dbaeumer.vscode-eslint"] : []),
+		...(usePrettier ? ["esbenp.prettier-vscode"] : []),
+	];
+
+
+	if (!recommendations.length) return;
 
 	const template = `
 {
-	"recommendations": [
-		${useESLint ? `"dbaeumer.vscode-eslint",` : ""}
-		${usePrettier ? `"esbenp.prettier-vscode",` : ""}
-	]
+	"recommendations": ${JSON.stringify(recommendations)}
 }
 `;
 return JSON.stringify(JSON5.parse(template), null, 4);

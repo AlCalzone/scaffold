@@ -14,13 +14,13 @@ const fsStub = {
 };
 
 const { readFile, readFileFromRootDir } = proxyquire<
-	typeof import("./createAdapter")
->("./createAdapter", {
+	typeof import("./projectGen")
+>("./projectGen", {
 	fs: fsStub,
 	"fs-extra": fsStub,
 });
 
-describe("createAdapter/readFile()", () => {
+describe("projectGen/readFile()", () => {
 	beforeEach(() => fsStub.reset());
 
 	it("calls fs.readFile with the absolute path", async () => {
@@ -64,7 +64,7 @@ describe("createAdapter/readFile()", () => {
 	});
 });
 
-describe("createAdapter/readFile()", () => {
+describe("projectGen/readFile()", () => {
 	beforeEach(() => fsStub.reset());
 
 	it("reads the file if it exists in the expected location", async () => {
