@@ -2,7 +2,7 @@
 // and contains references to all defined templates.
 // Do not edit it by hand or your changes will be lost!
 
-import type { TemplateFunction } from "../src/lib/projectGen";
+import type { TemplateFunction } from "../src/lib/scaffold";
 
 const templates: { name: string, templateFunction: TemplateFunction }[] = [
 	{ name: "_eslintignore.ts", templateFunction: require("./_eslintignore") },
@@ -10,10 +10,11 @@ const templates: { name: string, templateFunction: TemplateFunction }[] = [
 	{ name: "_github/auto-merge.yml.ts", templateFunction: require("./_github/auto-merge.yml") },
 	{ name: "_github/dependabot.yml.ts", templateFunction: require("./_github/dependabot.yml") },
 	{ name: "_github/workflows/dependabot-auto-merge.yml.ts", templateFunction: require("./_github/workflows/dependabot-auto-merge.yml") },
+	{ name: "_github/workflows/test-and-release.yml.ts", templateFunction: require("./_github/workflows/test-and-release.yml") },
 	{ name: "_gitignore.ts", templateFunction: require("./_gitignore") },
 	{ name: "_prettierignore.ts", templateFunction: require("./_prettierignore") },
 	{ name: "_prettierrc.js.ts", templateFunction: require("./_prettierrc.js") },
-	{ name: "_project-gen.json.ts", templateFunction: require("./_project-gen.json") },
+	{ name: "_scaffold.json.ts", templateFunction: require("./_scaffold.json") },
 	{ name: "_vscode/extensions.json.ts", templateFunction: require("./_vscode/extensions.json") },
 	{ name: "_vscode/settings.json.ts", templateFunction: require("./_vscode/settings.json") },
 	{ name: "LICENSE.ts", templateFunction: require("./LICENSE") },

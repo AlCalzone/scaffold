@@ -1,5 +1,5 @@
 import * as JSON5 from "json5";
-import type { TemplateFunction } from "../../src/lib/projectGen";
+import type { TemplateFunction } from "../../src/lib/scaffold";
 
 const templateFunction: TemplateFunction = answers => {
 
@@ -12,7 +12,6 @@ const templateFunction: TemplateFunction = answers => {
 	const template = `
 {
 ${useTypeScript ? `"typescript.tsdk": "node_modules/typescript/lib",` : ""}
-${useESLint ? `"eslint.enable": true,` : ""}
 ${usePrettier ? (`
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",

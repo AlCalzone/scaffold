@@ -41,7 +41,7 @@ const indexContent = `
 // and contains references to all defined templates.
 // Do not edit it by hand or your changes will be lost!
 
-import type { TemplateFunction } from "../src/lib/projectGen";
+import type { TemplateFunction } from "../src/lib/scaffold";
 
 const templates: { name: string, templateFunction: TemplateFunction }[] = [
 ${templatePaths.join(os.EOL)}

@@ -1,4 +1,4 @@
-import type { TemplateFunction } from "../src/lib/projectGen";
+import type { TemplateFunction } from "../src/lib/scaffold";
 import { getFormattedLicense } from "../src/lib/tools";
 
 export = (answers => {
@@ -9,25 +9,24 @@ export = (answers => {
 	const useReleaseScript = answers.releaseScript
 	const useDependabot = answers.dependabot
 
-	const npmScripts: Record<string, string> = {};
+	const pkgScripts: Record<string, string> = {};
 	if (useTypeScript) {
-		npmScripts["build"] = "Compile the TypeScript sources.";
-		npmScripts["watch"] = "Compile the TypeScript sources and watch for changes.";
+		pkgScripts["build"] = "Compile the TypeScript sources.";
+		pkgScripts["watch"] = "Compile the TypeScript sources and watch for changes.";
 	}
 	if (useESLint) {
-		npmScripts["lint"] = "Runs \`ESLint\` to check your code for formatting errors and potential bugs.";
+		pkgScripts["lint"] = "Runs \`ESLint\` to check your code for formatting errors and potential bugs.";
 	}
 	if (useReleaseScript) {
-		npmScripts["release"] = "Creates a new release, see [`@alcalzone/release-script`](https://github.com/AlCalzone/release-script#usage) for more details.";
+		pkgScripts["release"] = "Creates a new release, see [`@alcalzone/release-script`](https://github.com/AlCalzone/release-script#usage) for more details.";
 	}
+
+	const runcmd = answers.packageManager === "yarn" ? "yarn" : "npm run";
 
 	const template = `
 # ${answers.projectName}
 
 ${answers.description || "Describe your project here"}
-
-## Developer manual
-This section is intended for the developer. It can be deleted later
 
 ### Getting started
 
@@ -55,17 +54,17 @@ ${useDependabot ? (
 1. Head over to [src/main.ts](src/main.ts) and start programming!
 
 ### Scripts in \`package.json\`
-Several npm scripts are predefined for your convenience. You can run them using \`npm run <scriptname>\`
+Several ${answers.packageManager} scripts are predefined for your convenience. You can run them using \`${runcmd} <scriptname>\`
 | Script name | Description |
 |-------------|-------------|
-${Object.entries(npmScripts).map(([name, desc]) => (
+${Object.entries(pkgScripts).map(([name, desc]) => (
 	`| \`${name}\` | ${desc} |`
 )).join("\n")}
 
 ${useReleaseScript ? `Since you installed the release script, you can create a new
 release simply by calling:
 \`\`\`bash
-npm run release
+${runcmd} release
 \`\`\`
 Additional command line options for the release script are explained in the
 [release-script documentation](https://github.com/AlCalzone/release-script#command-line).` : ""}

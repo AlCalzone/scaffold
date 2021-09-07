@@ -1,5 +1,5 @@
 import * as JSON5 from "json5";
-import type { TemplateFunction } from "../../src/lib/projectGen";
+import type { TemplateFunction } from "../../src/lib/scaffold";
 
 const templateFunction: TemplateFunction = answers => {
 

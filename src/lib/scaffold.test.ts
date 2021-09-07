@@ -14,13 +14,13 @@ const fsStub = {
 };
 
 const { readFile, readFileFromRootDir } = proxyquire<
-	typeof import("./projectGen")
->("./projectGen", {
+	typeof import("./scaffold")
+>("./scaffold", {
 	fs: fsStub,
 	"fs-extra": fsStub,
 });
 
-describe("projectGen/readFile()", () => {
+describe("scaffold/readFile()", () => {
 	beforeEach(() => fsStub.reset());
 
 	it("calls fs.readFile with the absolute path", async () => {
@@ -64,7 +64,7 @@ describe("projectGen/readFile()", () => {
 	});
 });
 
-describe("projectGen/readFile()", () => {
+describe("scaffold/readFile()", () => {
 	beforeEach(() => fsStub.reset());
 
 	it("reads the file if it exists in the expected location", async () => {

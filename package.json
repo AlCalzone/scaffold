@@ -1,12 +1,12 @@
 {
-  "name": "project-gen",
+  "name": "@alcalzone/scaffold",
   "version": "0.0.1",
-  "description": "Generate GitHub repositories for new projects",
+  "description": "Quickly scaffold new Node.js projects",
   "keywords": [],
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "bin": {
-    "project-gen": "bin/project-gen.js"
+    "scaffold": "bin/scaffold.js"
   },
   "files": [
     "/bin",
@@ -17,13 +17,13 @@
     "email": "d.griesel@gmx.net"
   },
   "license": "MIT",
-  "homepage": "https://github.com/AlCalzone/project-gen#readme",
+  "homepage": "https://github.com/AlCalzone/scaffold#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AlCalzone/project-gen.git"
+    "url": "git+https://github.com/AlCalzone/scaffold.git"
   },
   "bugs": {
-    "url": "https://github.com/AlCalzone/project-gen/issues"
+    "url": "https://github.com/AlCalzone/scaffold/issues"
   },
   "engines": {
     "node": ">=14"
@@ -80,19 +80,22 @@
     "linkTemplates": "node --require ts-node/register maintenance/generateTemplateIndex.ts",
     "prebuild:cacheLicenses": "node --require ts-node/register maintenance/cacheLicenses.ts",
     "prebuild:cleanBuildDir": "rimraf ./build",
-    "prebuild": "npm run prebuild:cleanBuildDir && npm run linkTemplates && npm run prebuild:cacheLicenses",
+    "prebuild": "yarn prebuild:cleanBuildDir && yarn linkTemplates && yarn prebuild:cacheLicenses",
     "build": "tsc -p tsconfig.build.json",
     "postbuild": "copyfiles \"templates/**/*.raw.*\" build",
     "watch": "tsc -p tsconfig.build.json --watch",
     "test:ts": "mocha src/**/*.test.ts",
     "test:baselines": "mocha test/generate-baselines.test.ts",
-    "pretest": "npm run linkTemplates",
-    "test": "npm run test:ts && npm run test:baselines",
+    "pretest": "yarn linkTemplates",
+    "test": "yarn test:ts && yarn test:baselines",
     "test:watch": "mocha src/**/*.test.ts --watch",
     "lint:ts": "eslint {src,test,.github,maintenance}/**/*.ts",
-    "lint": "npm run lint:ts",
+    "lint": "yarn lint:ts",
     "release": "release-script",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "yarn build"
   },
-  "readme": "README.md"
+  "readme": "README.md",
+  "publishConfig": {
+    "access": "public"
+  }
 }

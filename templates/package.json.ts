@@ -3,7 +3,7 @@ import pLimit from "p-limit";
 import { licenses } from "../src/lib/core/licenses";
 import { getDefaultAnswer } from "../src/lib/core/questions";
 import { fetchPackageReferenceVersion, getPackageName } from "../src/lib/packageVersions";
-import type { TemplateFunction } from "../src/lib/projectGen";
+import type { TemplateFunction } from "../src/lib/scaffold";
 
 // Limit package version downloads to 10 simultaneous connections
 const downloadLimiter = pLimit(10);
@@ -61,33 +61,33 @@ const templateFunction: TemplateFunction = async answers => {
 	"name": "${answers.projectName.toLowerCase()}",
 	"version": "0.0.1",
 	"description": "${answers.description || answers.projectName}",
+	"keywords": ${JSON.stringify(answers.keywords || getDefaultAnswer("keywords"))},
+	"license": "${licenses[answers.license!].id}",
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"files": ${JSON.stringify(packageFiles)},
 	"author": {
 		"name": "${answers.authorName}",
 		"email": "${answers.authorEmail}",
 	},
-	"homepage": "https://github.com/${answers.authorGithub}/${answers.projectName}",
-	"license": "${licenses[answers.license!].id}",
-	"keywords": ${JSON.stringify(answers.keywords || getDefaultAnswer("keywords"))},
-	"repository": {
-		"type": "git",
-		"url": "${gitUrl}",
-	},
 	"dependencies": {${dependencies.join(",")}},
 	"devDependencies": {${devDependencies.join(",")}},
-	"main": "build/index.js",
-	"types": "build/index.d.ts",
-	"files": ${JSON.stringify(packageFiles)},
 	"scripts": {
 		"prebuild": "rimraf ./build",
 		"build": "tsc -p tsconfig.build.json",
 		"watch": "tsc -p tsconfig.build.json --watch",
-		"test:ts": "mocha --config test/mocharc.custom.json src/**/*.test.ts",
+		"test": "echo \\"No tests defined!\\" && exit 1",
 		${useESLint ? (`
 			"lint": "eslint --ext .ts src/",
 		`) : ""}
 		${useReleaseScript ? (`
 			"release": "release-script",
 		`) : ""}
+	},
+	"homepage": "https://github.com/${answers.authorGithub}/${answers.projectName}",
+	"repository": {
+		"type": "git",
+		"url": "${gitUrl}",
 	},
 	"bugs": {
 		"url": "https://github.com/${answers.authorGithub}/${answers.projectName}/issues",

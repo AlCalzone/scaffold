@@ -73,11 +73,11 @@ export interface QuestionMeta {
 	action?: QuestionAction<undefined | AnswerValue | AnswerValue[]>;
 	/** Whether an answer for this question is optional */
 	optional?: boolean;
-	/**
-	 * Whether this question should only be asked in expert mode.
-	 * In non-expert mode, the initial answer will be used.
-	 */
-	expert?: true;
+	// /**
+	//  * Whether this question should only be asked in expert mode.
+	//  * In non-expert mode, the initial answer will be used.
+	//  */
+	// expert?: true;
 }
 
 export type Question = SpecificPromptOptions &
@@ -233,7 +233,7 @@ export const questionGroups: QuestionGroup[] = [
 				name: "gitRemoteProtocol",
 				label: "GIT Protocol",
 				message: "Which protocol should be used for the repo URL?",
-				expert: true,
+				// expert: true,
 				initial: "HTTPS",
 				choices: [
 					{
@@ -250,7 +250,7 @@ export const questionGroups: QuestionGroup[] = [
 				type: "select",
 				name: "gitCommit",
 				label: "Git Commit",
-				expert: true,
+				// expert: true,
 				message: "Initialize the GitHub repo automatically?",
 				initial: "no",
 				choices: ["yes", "no"],
@@ -277,7 +277,7 @@ export const questionGroups: QuestionGroup[] = [
 				type: "select",
 				name: "dependabot",
 				label: "Dependabot",
-				expert: true,
+				// expert: true,
 				message: "Do you want to enable Dependabot?",
 				hint: "(recommended)",
 				initial: "no",

@@ -1,12 +1,12 @@
 // Disable API requests while testing
 process.env.TESTING = "true";
 
-import * as execa from "execa";
+import execa from "execa";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { projectGen } from "../src/index";
+import { scaffold } from "../src/index";
 import type { Answers } from "../src/lib/core/questions";
-import { File, writeFiles } from "../src/lib/projectGen";
+import { File, writeFiles } from "../src/lib/scaffold";
 
 const baselineDir = path.join(__dirname, "../test/baselines");
 
@@ -15,7 +15,7 @@ async function generateBaselines(
 	answers: Answers,
 	filterFilesPredicate?: (file: File) => boolean,
 ) {
-	const files = await projectGen(answers);
+	const files = await scaffold(answers);
 
 	const testDir = path.join(baselineDir, testName);
 	await fs.emptyDir(testDir);
@@ -28,12 +28,13 @@ async function generateBaselines(
 
 	// Include the npm package content in the baselines (only for full adapter tests)
 	if (!filterFilesPredicate && files.some((f) => f.name === "package.json")) {
-		let packageContent = execa
-			.sync("npm", ["pack", "--dry-run"], {
+		let packageContent = (
+			await execa("npm", ["pack", "--dry-run"], {
 				cwd: testDir,
 				encoding: "utf8",
 			})
-			.stderr.replace(/^npm notice /gim, "")
+		).stderr
+			.replace(/^npm notice /gim, "")
 			.trim();
 		packageContent = packageContent.substr(
 			packageContent.indexOf("=== Tarball"),
@@ -69,8 +70,8 @@ async function expectSuccess(
 
 const baseAnswers: Answers = {
 	projectName: "test-project",
-	description: "Is used to test the creator",
-	keywords: [],
+	description: "Is used to test the scaffolder",
+	// keywords: "" as any,
 
 	packageManager: "yarn",
 	nodeVersion: 14,
@@ -85,7 +86,7 @@ const baseAnswers: Answers = {
 	authorEmail: "al@calzo.ne",
 	gitRemoteProtocol: "HTTPS",
 
-	license: "MIT",
+	license: "MIT License",
 	dependabot: true,
 };
 

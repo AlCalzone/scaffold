@@ -30,7 +30,7 @@ function isProjectNameValid(name: string): CheckResult {
 	return true;
 }
 
-export function checkProjectName(name: string): CheckResult {
+export async function checkProjectName(name: string): Promise<CheckResult> {
 	const validCheck = isProjectNameValid(name);
 	if (typeof validCheck === "string") return validCheck;
 	return true;

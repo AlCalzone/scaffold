@@ -1,4 +1,4 @@
 export * from "./core";
 export * from "./packageVersions";
-export * from "./projectGen";
+export * from "./scaffold";
 export * from "./tools";

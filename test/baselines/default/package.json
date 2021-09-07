@@ -1,0 +1,46 @@
+{
+  "name": "test-project",
+  "version": "0.0.1",
+  "description": "Is used to test the scaffolder",
+  "keywords": [],
+  "license": "MIT",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build/",
+    "LICENSE"
+  ],
+  "author": {
+    "name": "Al Calzone",
+    "email": "al@calzo.ne"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@tsconfig/node14": "^1.0.1",
+    "@types/node": "^14.17.15",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2",
+    "rimraf": "^3.0.2",
+    "typescript": "~4.4.2"
+  },
+  "scripts": {
+    "prebuild": "rimraf ./build",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "test": "echo \"No tests defined!\" && exit 1",
+    "lint": "eslint --ext .ts src/"
+  },
+  "homepage": "https://github.com/AlCalzone/test-project",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlCalzone/test-project"
+  },
+  "bugs": {
+    "url": "https://github.com/AlCalzone/test-project/issues"
+  },
+  "readmeFilename": "README.md"
+}

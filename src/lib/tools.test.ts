@@ -7,7 +7,6 @@ import {
 	getOwnVersion,
 	indentWithSpaces,
 	indentWithTabs,
-	jsFixQuotes,
 	kebabCaseToUpperCamelCase,
 	tsFixQuotes,
 } from "./tools";
@@ -59,39 +58,39 @@ describe("tools/indentWithSpaces()", () => {
 	});
 });
 
-describe("tools/jsFixQuotes()", () => {
-	it("should change all quotes to single quotes if that is requested", () => {
-		const original = `const foo = "";
-const bar = "'";
-fn1(\`'\`);
-fn2('\\"');
-`;
+// describe("tools/jsFixQuotes()", () => {
+// 	it("should change all quotes to single quotes if that is requested", () => {
+// 		const original = `const foo = "";
+// const bar = "'";
+// fn1(\`'\`);
+// fn2('\\"');
+// `;
 
-		const expected = `const foo = '';
-const bar = "'";
-fn1(\`'\`);
-fn2('\\"');
-`;
+// 		const expected = `const foo = '';
+// const bar = "'";
+// fn1(\`'\`);
+// fn2('\\"');
+// `;
 
-		expect(jsFixQuotes(original, "single")).to.equal(expected);
-	});
+// 		expect(jsFixQuotes(original, "single")).to.equal(expected);
+// 	});
 
-	it("should change all quotes to double quotes if that is requested", () => {
-		const original = `const foo = '';
-const bar = "'";
-fn1(\`'\`);
-fn2('\\'');
-`;
+// 	it("should change all quotes to double quotes if that is requested", () => {
+// 		const original = `const foo = '';
+// const bar = "'";
+// fn1(\`'\`);
+// fn2('\\'');
+// `;
 
-		const expected = `const foo = "";
-const bar = "'";
-fn1(\`'\`);
-fn2("'");
-`;
+// 		const expected = `const foo = "";
+// const bar = "'";
+// fn1(\`'\`);
+// fn2("'");
+// `;
 
-		expect(jsFixQuotes(original, "double")).to.equal(expected);
-	});
-});
+// 		expect(jsFixQuotes(original, "double")).to.equal(expected);
+// 	});
+// });
 
 describe("tools/tsFixQuotes()", () => {
 	it("should change all quotes to single quotes if that is requested", () => {

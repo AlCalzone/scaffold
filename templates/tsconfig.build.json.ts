@@ -1,4 +1,4 @@
-import { readFile, TemplateFunction } from "../src/lib/projectGen";
+import { readFile, TemplateFunction } from "../src/lib/scaffold";
 
 export = (_answers => {
 

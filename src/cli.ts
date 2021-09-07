@@ -11,7 +11,7 @@ import {
 	questionGroups,
 	testCondition,
 } from "./lib/core/questions";
-import { createFiles, File, writeFiles } from "./lib/projectGen";
+import { createFiles, File, writeFiles } from "./lib/scaffold";
 import { error, getOwnVersion } from "./lib/tools";
 
 export type ConditionalTitle = (
@@ -20,7 +20,7 @@ export type ConditionalTitle = (
 
 /** Define command line arguments */
 const argv = yargs
-	.env("PROJECT_GEN")
+	.env("SCAFFOLD")
 	.strict()
 	.usage("Node.js project generator\n\nUsage: $0 [options]")
 	.alias("h", "help")
@@ -78,28 +78,25 @@ async function ask(): Promise<Answers> {
 					// answer was loaded using the "replay" feature
 					answer = { [q.name as string]: answers[q.name as string] };
 				} else {
-					if (
-						answers.expert !== "yes" &&
-						q.expert &&
-						q.initial !== undefined
-					) {
-						// In non-expert mode, prefill the default answer for expert questions
-						answer = { [q.name as string]: q.initial };
-					} else {
-						// Ask the user for an answer
-						try {
-							answer = await prompt(q);
-							// Cancel the process if necessary
-							if (answer[q.name as string] == undefined)
-								throw new Error();
-						} catch (e) {
-							error(
-								(e as Error).message ||
-									"Project generation canceled!",
-							);
-							return process.exit(1);
-						}
+					// if (
+					// 	answers.expert !== "yes" &&
+					// 	q.expert &&
+					// 	q.initial !== undefined
+					// ) {
+					// 	// In non-expert mode, prefill the default answer for expert questions
+					// 	answer = { [q.name as string]: q.initial };
+					// } else {
+					// Ask the user for an answer
+					try {
+						answer = await prompt(q);
+						// Cancel the process if necessary
+						if (answer[q.name as string] == undefined)
+							throw new Error();
+					} catch (e) {
+						error((e as Error).message || "Scaffolding canceled!");
+						return process.exit(1);
 					}
+					// }
 					// Apply an optional transformation
 					if (typeof q.resultTransform === "function") {
 						const transformed = q.resultTransform(
@@ -132,10 +129,10 @@ async function ask(): Promise<Answers> {
 		"",
 		green.bold(
 			`
-=======================================================
-   Welcome to AlCalzone's Node.js project generator!
+==============================================================
+   Welcome to AlCalzone's Node.js project scaffolding tool!
    version: ${getOwnVersion()}
-=======================================================
+==============================================================
 			`.trim(),
 		),
 		"",
@@ -205,12 +202,21 @@ async function setupProject_CLI(
 
 	if (installDependencies) {
 		logProgress("Installing dependencies");
-		await execa("npm", ["install", "--quiet"], { cwd: targetDir });
+		let [cmd, ...args] = (
+			answers.packageManager === "yarn"
+				? "yarn install --silent"
+				: "npm install --quiet"
+		).split(" ");
+		await execa(cmd, args, { cwd: targetDir });
 
 		if (needsBuildStep) {
 			logProgress("Compiling source files");
-			await execa("npm", ["run", "build"], {
-				cwd: targetDir,
+			[cmd, ...args] = (
+				answers.packageManager === "yarn"
+					? "yarn build"
+					: "npm run build"
+			).split(" ");
+			await execa(cmd, args, {
 				stdout: "ignore",
 			});
 		}
@@ -267,4 +273,5 @@ if (process.env.TEST_STARTUP) {
 
 process.on("exit", () => {
 	if (fs.pathExistsSync("npm-debug.log")) fs.removeSync("npm-debug.log");
+	if (fs.pathExistsSync("yarn-debug.log")) fs.removeSync("yarn-debug.log");
 });

@@ -4,9 +4,9 @@ import {
 	formatAnswers,
 	validateAnswers,
 } from "./lib/core/questions";
-import { createFiles, File } from "./lib/projectGen";
+import { createFiles, File } from "./lib/scaffold";
 
-export async function projectGen(
+export async function scaffold(
 	answers: Answers,
 	disableValidation: (keyof Answers)[] = [],
 ): Promise<File[]> {
