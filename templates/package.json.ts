@@ -23,6 +23,7 @@ const templateFunction: TemplateFunction = async answers => {
 
 	const useESLint = !!answers.tools?.includes("ESLint");
 	const usePrettier = !!answers.tools?.includes("Prettier");
+	const useCommitlint = !!answers.tools?.includes("Commitlint");
 	const useReleaseScript = answers.releaseScript;
 	const useJest = answers.testing === "jest";
 	const useMocha = answers.testing === "mocha";
@@ -47,6 +48,12 @@ const templateFunction: TemplateFunction = async answers => {
 		...(usePrettier
 			? ["eslint-config-prettier", "eslint-plugin-prettier", "prettier"]
 			: []),
+		...(useCommitlint ? [
+				"@commitlint/cli",
+				"@commitlint/config-conventional",
+				"commitizen",
+				"husky@7"
+		] : []),
 		...(useReleaseScript ? ["@alcalzone/release-script@^2"] : []),
 		...(useJest ? [
 			"@babel/cli",
@@ -135,6 +142,10 @@ const templateFunction: TemplateFunction = async answers => {
 		${useReleaseScript ? (`
 			"release": "release-script",
 		`) : ""}
+		${useCommitlint ? (`
+			"commit": "git-cz",
+			"postinstall": "husky install",
+		`) : ""}
 	},
 	"homepage": "https://github.com/${answers.authorGithub}/${answers.projectName}",
 	"repository": {
@@ -145,6 +156,13 @@ const templateFunction: TemplateFunction = async answers => {
 		"url": "https://github.com/${answers.authorGithub}/${answers.projectName}/issues",
 	},
 	"readmeFilename": "README.md",
+	${useCommitlint ? (`
+		"config": {
+			"commitizen": {
+				"path": "./node_modules/cz-conventional-changelog"
+			}
+		}
+	`) : ""}
 }`;
 	return JSON.stringify(JSON5.parse(template), null, 2);
 };

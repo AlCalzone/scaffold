@@ -200,6 +200,16 @@ async function setupProject_CLI(
 			: path.join(rootDir, answers.projectName);
 	await writeFiles(targetDir, files);
 
+	// When using Commitlint, the git repo must be initialized before installing dependencies
+	const useCommitlint = answers.tools.includes("Commitlint");
+	if (useCommitlint) {
+		await execa("git", ["init"], {
+			cwd: targetDir,
+			stdout: "ignore",
+			stderr: "ignore",
+		});
+	}
+
 	if (installDependencies) {
 		logProgress("Installing dependencies");
 		let [cmd, ...args] = (
@@ -230,7 +240,7 @@ async function setupProject_CLI(
 				? `https://github.com/${answers.authorGithub}/${answers.projectName}`
 				: `git@github.com:${answers.authorGithub}/${answers.projectName}.git`;
 		const gitCommandArgs = [
-			["init"],
+			...(useCommitlint ? [] : [["init"]]),
 			["add", "."],
 			["commit", "-m", "Initial commit"],
 			["remote", "add", "origin", gitUrl],

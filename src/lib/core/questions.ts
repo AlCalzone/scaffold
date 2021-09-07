@@ -171,6 +171,7 @@ export const questionGroups: QuestionGroup[] = [
 						message: "Prettier",
 						hint: "(requires ESLint, recommended)",
 					},
+					{ message: "Commitlint", hint: "(using Husky)" },
 				],
 				action: checkTypeScriptTools,
 			}),
@@ -319,7 +320,7 @@ export interface Answers {
 	packageManager: "npm" | "yarn";
 	nodeVersion: 12 | 14 | 16;
 
-	tools: ("ESLint" | "Prettier")[];
+	tools: ("ESLint" | "Prettier" | "Commitlint")[];
 	testing: "jest" | "mocha" | "none";
 	releaseScript: boolean;
 	indentation?: "Tab" | "Space (4)";
