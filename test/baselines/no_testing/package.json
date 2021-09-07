@@ -4,18 +4,19 @@
   "description": "Is used to test the scaffolder",
   "keywords": [],
   "license": "MIT",
+  "author": {
+    "name": "Al Calzone",
+    "email": "al@calzo.ne"
+  },
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "files": [
     "build/",
     "LICENSE"
   ],
-  "author": {
-    "name": "Al Calzone",
-    "email": "al@calzo.ne"
-  },
   "dependencies": {},
   "devDependencies": {
+    "@alcalzone/release-script": "^2.2.1",
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
     "@tsconfig/node14": "^1.0.1",
@@ -39,6 +40,7 @@
     "watch": "tsc -p tsconfig.build.json --watch",
     "test": "echo \"No tests defined!\" && exit 1",
     "lint": "eslint --ext .ts src/",
+    "release": "release-script",
     "commit": "git-cz",
     "postinstall": "husky install"
   },

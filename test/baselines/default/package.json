@@ -4,18 +4,19 @@
   "description": "Is used to test the scaffolder",
   "keywords": [],
   "license": "MIT",
+  "author": {
+    "name": "Al Calzone",
+    "email": "al@calzo.ne"
+  },
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "files": [
     "build/",
     "LICENSE"
   ],
-  "author": {
-    "name": "Al Calzone",
-    "email": "al@calzo.ne"
-  },
   "dependencies": {},
   "devDependencies": {
+    "@alcalzone/release-script": "^2.2.1",
     "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.4",
@@ -51,6 +52,7 @@
     "coverage:ci": "yarn test:ci --collect-coverage",
     "coverage": "yarn test:ts --collect-coverage",
     "lint": "eslint --ext .ts src/",
+    "release": "release-script",
     "commit": "git-cz",
     "postinstall": "husky install"
   },
