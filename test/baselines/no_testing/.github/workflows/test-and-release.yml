@@ -69,7 +69,7 @@ jobs:
               run: yarn build
 
             - name: Run unit tests
-              run: yarn test:ci
+              run: yarn test
               
 # TODO: To enable automatic npm releases, create a token on npmjs.org 
 # Enter this token as a GitHub secret (with name NPM_TOKEN) in the repository options

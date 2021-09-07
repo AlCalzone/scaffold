@@ -77,6 +77,7 @@ const baseAnswers: Answers = {
 	nodeVersion: 14,
 
 	tools: ["ESLint", "Prettier"],
+	testing: "jest",
 	releaseScript: true,
 	indentation: "Tab",
 	quotes: "double",
@@ -171,11 +172,27 @@ describe("adapter creation =>", () => {
 		});
 
 		describe("full adapter dir =>", () => {
-			it("Default setup: yarn, Node 14, ESLint+Prettier, Release Script, Tab, Double Quotes, MIT, Dependabot", async () => {
+			it("Default setup: yarn, Node 14, ESLint+Prettier, Jest, Release Script, Tab, Double Quotes, MIT, Dependabot", async () => {
 				const answers: Answers = {
 					...baseAnswers,
 				};
 				await expectSuccess("default", answers);
+			});
+
+			it("Mocha instead of Jest", async () => {
+				const answers: Answers = {
+					...baseAnswers,
+					testing: "mocha",
+				};
+				await expectSuccess("mocha", answers);
+			});
+
+			it("No testing", async () => {
+				const answers: Answers = {
+					...baseAnswers,
+					testing: "none",
+				};
+				await expectSuccess("no_testing", answers);
 			});
 
 			// it("Adapter, TypeScript (ES6 class), ESLint, Tabs, Double quotes, MIT License", async () => {

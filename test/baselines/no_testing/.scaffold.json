@@ -4,7 +4,7 @@
 	"packageManager": "yarn",
 	"nodeVersion": 14,
 	"tools": ["ESLint", "Prettier"],
-	"testing": "jest",
+	"testing": "none",
 	"releaseScript": false,
 	"indentation": "Tab",
 	"quotes": "double",
