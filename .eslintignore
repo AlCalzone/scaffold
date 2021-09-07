@@ -1,0 +1,4 @@
+build/
+test/baselines/
+.eslintrc.js
+.prettierrc.js

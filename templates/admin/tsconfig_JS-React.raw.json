@@ -1,0 +1,29 @@
+// Specialized tsconfig for the admin directory,
+// includes DOM typings and configures the admin build
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"noEmit": false,
+		"outDir": "./build",
+		"sourceMap": true,
+		"sourceRoot": "./src",
+		"noImplicitAny": false,
+		"lib": [
+			"es2018",
+			"DOM"
+		],
+
+		// Support React - both must be here because parcel v1 does not
+		// evaluate the "extends" option
+		"jsx": "react",
+		"esModuleInterop": true
+	},
+	"include": [
+		"./**/*.d.ts",
+		"./**/*.jsx",
+		"../src/lib/adapter-config.d.ts"
+	],
+	"exclude": [
+		"./**/*.test.jsx"
+	]
+}
