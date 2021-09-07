@@ -175,7 +175,7 @@ describe("adapter creation =>", () => {
 			);
 		});
 
-		describe("full adapter dir =>", () => {
+		describe("full project dir =>", () => {
 			it("Default setup: yarn, Node 14, ESLint+Prettier+Commitlint, Jest, Release Script, Tab, Double Quotes, MIT, Dependabot", async () => {
 				const answers: Answers = {
 					...baseAnswers,

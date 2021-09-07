@@ -1,10 +1,10 @@
 # AlCalzone's project scaffolding tool
 
-Command line utility to quickly create a new TypeScript project.
+Command line utility to quickly create a new TypeScript Node.js project.
 
 ## Prerequisites
 
-Any computer with NodeJS in version 12 or higher and npm 6 or higher.
+Any computer with Node.js in version 14 or higher and npm 6 or higher.
 
 ## Usage
 
