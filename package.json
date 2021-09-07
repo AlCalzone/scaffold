@@ -1,6 +1,6 @@
 {
   "name": "@alcalzone/scaffold",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Command line utility to quickly create a new TypeScript Node.js project",
   "keywords": [],
   "main": "build/index.js",
