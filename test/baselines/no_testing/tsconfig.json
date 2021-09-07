@@ -7,6 +7,7 @@
 		// do not compile anything, this file is just to configure type checking
 		// the compilation is configured in tsconfig.build.json
 		"noEmit": true,
+
 		// Never emit faulty JS
 		"noEmitOnError": true,
 

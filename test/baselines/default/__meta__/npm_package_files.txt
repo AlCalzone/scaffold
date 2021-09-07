@@ -10,6 +10,4 @@ package size:  2.4 kB
 unpacked size: 6.2 kB                                  
 shasum:        2021c0158af8d2f7a2b5cd08993115b29f31e81a
 integrity:     sha512-pV1tdlY61912I[...]iqkiGXURk2yRw==
-total files:   3                                       
-
-Waiting for the debugger to disconnect...
+total files:   3

@@ -1,0 +1,37 @@
+{
+  "name": "@test-project/package-1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.1",
+  "description": "Is used to test the scaffolder",
+  "keywords": [],
+  "license": "MIT",
+  "author": {
+    "name": "Al Calzone",
+    "email": "al@calzo.ne"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build/",
+    "LICENSE"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "clean": "tsc -b tsconfig.build.json --clean",
+    "prebuild": "rimraf ./build",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch"
+  },
+  "homepage": "https://github.com/AlCalzone/test-project",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlCalzone/test-project"
+  },
+  "bugs": {
+    "url": "https://github.com/AlCalzone/test-project/issues"
+  },
+  "readmeFilename": "README.md"
+}

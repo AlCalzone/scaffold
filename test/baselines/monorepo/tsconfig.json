@@ -4,9 +4,10 @@
 	// https://github.com/tsconfig/bases#node-14-tsconfigjson
 	"extends": "@tsconfig/node14/tsconfig.json",
 	"compilerOptions": {
-		// do not compile anything, this file is just to configure type checking
-		// the compilation is configured in tsconfig.build.json
-		"noEmit": true,
+		// Required for monorepos
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
 
 		// Never emit faulty JS
 		"noEmitOnError": true,
@@ -21,6 +22,6 @@
 		"sourceMap": true,
 		"inlineSourceMap": false
 	},
-	"include": ["**/*.ts"],
-	"exclude": ["build/**", "node_modules/**"]
+	"include": ["packages/**/src/**/*.ts", "test/**/*.ts"],
+	"exclude": ["**/build/**", "node_modules/**", "packages/**/node_modules"]
 }

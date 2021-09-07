@@ -34,7 +34,7 @@ jobs:
                   cache: 'yarn'
 
             - name: Install Dependencies
-              run: yarn install --immutable
+              run: yarn install --prefer-offline --frozen-lockfile
 
             - name: Compile TypeScript code
               run: yarn build
@@ -63,7 +63,7 @@ jobs:
                   cache: 'yarn'
 
             - name: Install Dependencies
-              run: yarn install --immutable
+              run: yarn install --prefer-offline --frozen-lockfile
 
             - name: Compile TypeScript code
               run: yarn build
@@ -114,7 +114,7 @@ jobs:
 #                  echo "::set-output name=BODY::$BODY"
 #
 #            - name: Install Dependencies
-#              run: yarn install --immutable
+#              run: yarn install --prefer-offline --frozen-lockfile
 #
 #            - name: Create a clean build
 #              run: yarn build

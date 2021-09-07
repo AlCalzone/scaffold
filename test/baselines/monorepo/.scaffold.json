@@ -1,0 +1,20 @@
+{
+	"projectName": "test-project",
+	"description": "Is used to test the scaffolder",
+	"packageManager": "yarn",
+	"nodeVersion": 14,
+	"tools": ["ESLint", "Prettier", "Commitlint"],
+	"monorepo": true,
+	"testing": "jest",
+	"releaseScript": true,
+	"indentation": "Tab",
+	"quotes": "double",
+	"authorName": "Al Calzone",
+	"authorGithub": "AlCalzone",
+	"authorEmail": "al@calzo.ne",
+	"gitRemoteProtocol": "HTTPS",
+	"license": "MIT License",
+	"dependabot": true,
+	"monorepoPackageName": "package-1",
+	"creatorVersion": "0.0.1"
+}

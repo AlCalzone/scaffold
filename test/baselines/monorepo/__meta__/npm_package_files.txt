@@ -1,0 +1,11 @@
+=== Tarball Contents === 
+889B package.json
+=== Tarball Details === 
+name:          @test-project/package-1                 
+version:       0.0.1                                   
+filename:      test-project-package-1-0.0.1.tgz        
+package size:  494 B                                   
+unpacked size: 889 B                                   
+shasum:        00df6d34d8138a195fba040cf2843a09c7684d70
+integrity:     sha512-lDLqU2BhDLfW8[...]u9zxlmv4XFi0w==
+total files:   1
