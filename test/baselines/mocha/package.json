@@ -16,6 +16,8 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0",
     "@tsconfig/node14": "^1.0.1",
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
@@ -27,9 +29,11 @@
     "@typescript-eslint/parser": "^4.31.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
+    "commitizen": "^4.2.4",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.2",
     "mocha": "^9.1.1",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
@@ -46,7 +50,9 @@
     "test:ts": "mocha src/**/*.test.ts",
     "test:ci": "yarn test:ts",
     "test": "yarn test:ts --watch",
-    "lint": "eslint --ext .ts src/"
+    "lint": "eslint --ext .ts src/",
+    "commit": "git-cz",
+    "postinstall": "husky install"
   },
   "homepage": "https://github.com/AlCalzone/test-project",
   "repository": {
@@ -56,5 +62,10 @@
   "bugs": {
     "url": "https://github.com/AlCalzone/test-project/issues"
   },
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }

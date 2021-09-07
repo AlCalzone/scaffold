@@ -20,14 +20,18 @@
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.4",
     "@babel/preset-typescript": "^7.15.0",
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.0.1",
     "@types/node": "^14.17.15",
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
+    "commitizen": "^4.2.4",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.2",
     "jest": "^27.1.0",
     "jest-extended": "^0.11.5",
     "prettier": "^2.3.2",
@@ -46,7 +50,9 @@
     "test": "yarn test:ts --watch",
     "coverage:ci": "yarn test:ci --collect-coverage",
     "coverage": "yarn test:ts --collect-coverage",
-    "lint": "eslint --ext .ts src/"
+    "lint": "eslint --ext .ts src/",
+    "commit": "git-cz",
+    "postinstall": "husky install"
   },
   "homepage": "https://github.com/AlCalzone/test-project",
   "repository": {
@@ -56,5 +62,10 @@
   "bugs": {
     "url": "https://github.com/AlCalzone/test-project/issues"
   },
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }

@@ -76,7 +76,7 @@ const baseAnswers: Answers = {
 	packageManager: "yarn",
 	nodeVersion: 14,
 
-	tools: ["ESLint", "Prettier"],
+	tools: ["ESLint", "Prettier", "Commitlint"],
 	testing: "jest",
 	releaseScript: true,
 	indentation: "Tab",
@@ -172,7 +172,7 @@ describe("adapter creation =>", () => {
 		});
 
 		describe("full adapter dir =>", () => {
-			it("Default setup: yarn, Node 14, ESLint+Prettier, Jest, Release Script, Tab, Double Quotes, MIT, Dependabot", async () => {
+			it("Default setup: yarn, Node 14, ESLint+Prettier+Commitlint, Jest, Release Script, Tab, Double Quotes, MIT, Dependabot", async () => {
 				const answers: Answers = {
 					...baseAnswers,
 				};

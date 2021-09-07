@@ -3,7 +3,7 @@
 	"description": "Is used to test the scaffolder",
 	"packageManager": "yarn",
 	"nodeVersion": 14,
-	"tools": ["ESLint", "Prettier"],
+	"tools": ["ESLint", "Prettier", "Commitlint"],
 	"testing": "none",
 	"releaseScript": false,
 	"indentation": "Tab",
