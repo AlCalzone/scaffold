@@ -12,11 +12,30 @@
     "email": "al@calzo.ne"
   },
   "main": "build/index.js",
+  "exports": {
+    ".": "./build/index.js",
+    "./package.json": "./package.json",
+    "./*.map": "./build/*.js.map",
+    "./*": "./build/*.js"
+  },
   "types": "build/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "build/index.d.ts": [
+        "build/index.d.ts"
+      ],
+      "*": [
+        "build/*"
+      ]
+    }
+  },
   "files": [
     "build/",
     "LICENSE"
   ],
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {},
   "devDependencies": {},
   "scripts": {

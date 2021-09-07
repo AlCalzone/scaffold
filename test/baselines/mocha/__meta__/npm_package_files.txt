@@ -1,13 +1,13 @@
 === Tarball Contents === 
 1.1kB LICENSE     
-2.0kB package.json
+2.3kB package.json
 3.0kB README.md   
 === Tarball Details === 
 name:          test-project                            
 version:       0.0.1                                   
 filename:      test-project-0.0.1.tgz                  
 package size:  2.4 kB                                  
-unpacked size: 6.1 kB                                  
-shasum:        eaaf9b9abdf9e0b784f37411673ffb33db3b4434
-integrity:     sha512-/mfQ1ryShMVFy[...]tYkN8zO407ZRg==
+unpacked size: 6.4 kB                                  
+shasum:        39806c41bda6751966cdb02bef18127a05845147
+integrity:     sha512-v5VLoe5K2L7FI[...]HYm5ZWbPRl/yg==
 total files:   3
