@@ -1,5 +1,6 @@
 import { blueBright, gray, green, red, underline } from "ansi-colors";
 import { prompt } from "enquirer";
+import execa from "execa";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as yargs from "yargs";
@@ -11,7 +12,7 @@ import {
 	testCondition,
 } from "./lib/core/questions";
 import { createFiles, File, writeFiles } from "./lib/projectGen";
-import { error, executeCommand, getOwnVersion, isWindows } from "./lib/tools";
+import { error, getOwnVersion } from "./lib/tools";
 
 export type ConditionalTitle = (
 	answers: Record<string, any>,
@@ -94,7 +95,7 @@ async function ask(): Promise<Answers> {
 						} catch (e) {
 							error(
 								(e as Error).message ||
-									"Adapter creation canceled!",
+									"Project generation canceled!",
 							);
 							return process.exit(1);
 						}
@@ -129,11 +130,14 @@ async function ask(): Promise<Answers> {
 
 	const questionsAndText: (QuestionGroup | string | ConditionalTitle)[] = [
 		"",
-		green.bold("====================================================="),
 		green.bold(
-			`   Welcome to the ioBroker adapter creator v${getOwnVersion()}!`,
+			`
+=======================================================
+   Welcome to AlCalzone's Node.js project generator!
+   version: ${getOwnVersion()}
+=======================================================
+			`.trim(),
 		),
-		green.bold("====================================================="),
 		"",
 		gray(`You can cancel at any point by pressing Ctrl+C.`),
 		(answers) => (!!answers.replay ? green(`Replaying file`) : undefined),
@@ -185,8 +189,6 @@ const installDependencies = !argv.noInstall || !!argv.install;
 let needsBuildStep: boolean;
 /** Whether the initial commit should be performed automatically */
 let gitCommit: boolean;
-/** Whether dev-server should be installed */
-let devServer: boolean;
 
 /** CLI-specific functionality for creating the adapter directory */
 async function setupProject_CLI(
@@ -194,44 +196,24 @@ async function setupProject_CLI(
 	files: File[],
 ): Promise<void> {
 	const rootDirName = path.basename(rootDir);
-	// make sure we are working in a directory called ioBroker.<adapterName>
+	// make sure we are working in a directory called like the project
 	const targetDir =
-		rootDirName.toLowerCase() ===
-		`iobroker.${answers.adapterName.toLowerCase()}`
+		rootDirName.toLowerCase() === answers.projectName
 			? rootDir
-			: path.join(rootDir, `ioBroker.${answers.adapterName}`);
+			: path.join(rootDir, answers.projectName);
 	await writeFiles(targetDir, files);
 
 	if (installDependencies) {
 		logProgress("Installing dependencies");
-		await executeCommand(
-			isWindows ? "npm.cmd" : "npm",
-			["install", "--quiet"],
-			{ cwd: targetDir },
-		);
+		await execa("npm", ["install", "--quiet"], { cwd: targetDir });
 
 		if (needsBuildStep) {
 			logProgress("Compiling source files");
-			await executeCommand(
-				isWindows ? "npm.cmd" : "npm",
-				["run", "build"],
-				{ cwd: targetDir, stdout: "ignore" },
-			);
+			await execa("npm", ["run", "build"], {
+				cwd: targetDir,
+				stdout: "ignore",
+			});
 		}
-	}
-
-	if (devServer) {
-		logProgress("Installing dev-server");
-		await executeCommand(
-			isWindows ? "npm.cmd" : "npm",
-			["install", "--quiet", "--global", "@iobroker/dev-server"],
-			{ cwd: targetDir },
-		);
-		await executeCommand(
-			isWindows ? "iobroker-dev-server.cmd" : "iobroker-dev-server",
-			["setup", "--adminPort", `${answers.devServerPort}`],
-			{ cwd: targetDir },
-		);
 	}
 
 	if (gitCommit) {
@@ -239,8 +221,8 @@ async function setupProject_CLI(
 		// As described here: https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
 		const gitUrl =
 			answers.gitRemoteProtocol === "HTTPS"
-				? `https://github.com/${answers.authorGithub}/ioBroker.${answers.adapterName}`
-				: `git@github.com:${answers.authorGithub}/ioBroker.${answers.adapterName}.git`;
+				? `https://github.com/${answers.authorGithub}/${answers.projectName}`
+				: `git@github.com:${answers.authorGithub}/${answers.projectName}.git`;
 		const gitCommandArgs = [
 			["init"],
 			["add", "."],
@@ -248,7 +230,7 @@ async function setupProject_CLI(
 			["remote", "add", "origin", gitUrl],
 		];
 		for (const args of gitCommandArgs) {
-			await executeCommand("git", args, {
+			await execa("git", args, {
 				cwd: targetDir,
 				stdout: "ignore",
 				stderr: "ignore",
@@ -271,15 +253,10 @@ if (process.env.TEST_STARTUP) {
 
 	if (installDependencies) {
 		maxSteps++;
-		needsBuildStep =
-			answers.language === "TypeScript" ||
-			answers.adminReact === "yes" ||
-			answers.tabReact === "yes";
+		needsBuildStep = true; // TypeScript!
 		if (needsBuildStep) maxSteps++;
 	}
-	devServer = answers.devServer === "yes";
-	if (devServer) maxSteps++;
-	gitCommit = answers.gitCommit === "yes";
+	gitCommit = !!answers.gitCommit;
 	if (gitCommit) maxSteps++;
 
 	logProgress("Generating files");

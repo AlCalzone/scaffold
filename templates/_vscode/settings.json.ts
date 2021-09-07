@@ -3,9 +3,9 @@ import type { TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
-	const useESLint = answers.tools && answers.tools.indexOf("ESLint") > -1;
-	const usePrettier = answers.tools && answers.tools.indexOf("Prettier") > -1;
-	const useTypeScript = answers.language === "TypeScript";
+	const useESLint = !!answers.tools?.includes("ESLint");
+	const usePrettier = !!answers.tools?.includes("Prettier");
+	const useTypeScript = true; //answers.language === "TypeScript";
 
 	if (!useESLint && !usePrettier && !useTypeScript) return;
 

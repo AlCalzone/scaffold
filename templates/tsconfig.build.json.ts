@@ -1,8 +1,8 @@
 import { readFile, TemplateFunction } from "../src/lib/projectGen";
 
-export = (answers => {
+export = (_answers => {
 
-	const useTypeScript = answers.language === "TypeScript";
+	const useTypeScript = true; //answers.language === "TypeScript";
 	if (!useTypeScript) return;
 
 	return readFile("tsconfig.build.raw.json", __dirname);

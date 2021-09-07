@@ -2,8 +2,7 @@ import type { TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
-	const useDependabot = answers.dependabot === "yes";
-	if (!useDependabot) return;
+	if (!answers.dependabot) return;
 
 	const template = `
 version: 2

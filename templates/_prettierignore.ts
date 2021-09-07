@@ -4,9 +4,12 @@ const templateFunction: TemplateFunction = answers => {
 
 	const usePrettier = answers.tools && answers.tools.indexOf("Prettier") > -1;
 	if (!usePrettier) return;
-	const useTypeScript = answers.language === "TypeScript";
+	const useTypeScript = true; //answers.language === "TypeScript";
 
 	const template = `
+.github/actions/**/*.yml
+.github/workflows/
+CHANGELOG*.md
 package.json
 package-lock.json
 ${useTypeScript ? "build/" : ""}

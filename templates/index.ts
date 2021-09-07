@@ -10,7 +10,6 @@ const templates: { name: string, templateFunction: TemplateFunction }[] = [
 	{ name: "_github/auto-merge.yml.ts", templateFunction: require("./_github/auto-merge.yml") },
 	{ name: "_github/dependabot.yml.ts", templateFunction: require("./_github/dependabot.yml") },
 	{ name: "_github/workflows/dependabot-auto-merge.yml.ts", templateFunction: require("./_github/workflows/dependabot-auto-merge.yml") },
-	{ name: "_github/workflows/test-and-release.yml.ts", templateFunction: require("./_github/workflows/test-and-release.yml") },
 	{ name: "_gitignore.ts", templateFunction: require("./_gitignore") },
 	{ name: "_prettierignore.ts", templateFunction: require("./_prettierignore") },
 	{ name: "_prettierrc.js.ts", templateFunction: require("./_prettierrc.js") },
@@ -20,7 +19,7 @@ const templates: { name: string, templateFunction: TemplateFunction }[] = [
 	{ name: "LICENSE.ts", templateFunction: require("./LICENSE") },
 	{ name: "package.json.ts", templateFunction: require("./package.json") },
 	{ name: "README.md.ts", templateFunction: require("./README.md") },
-	{ name: "src/main.ts.ts", templateFunction: require("./src/main.ts") },
+	{ name: "src/index.ts.ts", templateFunction: require("./src/index.ts") },
 	{ name: "tsconfig.build.json.ts", templateFunction: require("./tsconfig.build.json") },
 	{ name: "tsconfig.json.ts", templateFunction: require("./tsconfig.json") },
 ];

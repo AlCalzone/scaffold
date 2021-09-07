@@ -2,40 +2,31 @@ import type { TemplateFunction } from "../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
-	// This version is intended for use in TS projects
-	if (answers.language !== "TypeScript") return;
-
 	const useESLint = answers.tools && answers.tools.indexOf("ESLint") > -1;
 	if (!useESLint) return;
 	const usePrettier = answers.tools && answers.tools.indexOf("Prettier") > -1;
-	const useReact =
-		answers.adminReact === "yes" || answers.tabReact === "yes";
+
+	const esVersion = {
+		12: 2019,
+		14: 2020,
+		16: 2021,
+	} as const;
 
 	const template = `
 module.exports = {
 	root: true, // Don't look outside this project for inherited configs
 	parser: "@typescript-eslint/parser", // Specifies the ESLint parser
 	parserOptions: {
-		ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+		ecmaVersion: ${esVersion[answers.nodeVersion]}, // Allows for the parsing of modern ECMAScript features
 		sourceType: "module", // Allows for the use of imports
-		project: "./tsconfig.json",${useReact ? (`
-		ecmaFeatures: {
-			jsx: true,
-		},`) : ""}
+		project: "./tsconfig.json",
 	},
 	extends: [
 		"plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
 ${usePrettier ? (`
 		"plugin:prettier/recommended", // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
-`) : ""}${useReact ? (`
-		"plugin:react/recommended", // Supports React JSX
 `) : ""}	],
-	plugins: [${useReact ? `"react"` : ""}],${useReact ? (`
-	settings: {
-		react: {
-			version: "detect",
-		},
-	},`): ""}
+	plugins: [],
 	rules: {${usePrettier ? "" : (`
 		"indent": "off",
 		"@typescript-eslint/indent": [
@@ -86,7 +77,7 @@ ${usePrettier ? (`
 	},
 	overrides: [
 		{
-			files: ["*.test.ts"${useReact ? `, "*.tsx"` : ""}],
+			files: ["*.test.ts"],
 			rules: {
 				"@typescript-eslint/explicit-function-return-type": "off",
 			},

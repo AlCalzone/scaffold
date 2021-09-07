@@ -2,13 +2,12 @@ import { isArray } from "alcalzone-shared/typeguards";
 import { dim, gray, green } from "ansi-colors";
 import type { SpecificPromptOptions } from "enquirer";
 import {
-	checkAdapterName,
 	checkAuthorName,
 	checkEmail,
-	checkMinSelections,
+	checkProjectName,
 	CheckResult,
 	checkTypeScriptTools,
-	transformContributors,
+	makeBool,
 	transformDescription,
 	transformKeywords,
 } from "./actionsAndTransformers";
@@ -81,7 +80,8 @@ export interface QuestionMeta {
 	expert?: true;
 }
 
-export type Question = SpecificPromptOptions & QuestionMeta;
+export type Question = SpecificPromptOptions &
+	QuestionMeta & { name: keyof Answers };
 export interface QuestionGroup {
 	title: string;
 	headline: string;
@@ -113,10 +113,10 @@ export const questionGroups: QuestionGroup[] = [
 		questions: [
 			{
 				type: "input",
-				name: "adapterName",
-				label: "Adapter Name",
+				name: "projectName",
+				label: "Project Name",
 				message: "Please enter the name of your project:",
-				action: checkAdapterName,
+				action: checkProjectName,
 			},
 			{
 				type: "input",
@@ -137,385 +137,39 @@ export const questionGroups: QuestionGroup[] = [
 				optional: true,
 				resultTransform: transformKeywords,
 			},
-			{
-				type: "input",
-				name: "contributors",
-				label: "Contributors",
-				message:
-					"If you have any contributors, please enter their names (seperated by commas):",
-				hint: "(optional)",
-				optional: true,
-				resultTransform: transformContributors,
-			},
-			{
-				condition: { name: "cli", value: false },
-				type: "web_upload" as any,
-				name: "icon",
-				label: "Adapter Icon",
-				message: "Upload your adapter icon",
-				hint: "(optional)",
-				optional: true,
-			},
 		],
 	},
 	{
-		title: "Technical",
-		headline: "Nice! Let's get technical...",
+		title: "Environment",
+		headline: "Let's configure the development environment...",
 		questions: [
 			{
 				type: "select",
-				name: "expert",
-				label: "Expert Mode",
-				message: "How detailed do you want to configure your project?",
-				choices: [
-					{
-						message: "Just ask me the most important stuff!",
-						value: "no",
-					},
-					{ message: "I want to specify everything!", value: "yes" },
-				],
-				optional: true,
+				name: "packageManager",
+				label: "Package manager",
+				message: "Which package manager would you like to use?",
+				initial: "yarn",
+				choices: ["yarn", "npm"],
+			},
+			{
+				type: "select",
+				name: "nodeVersion",
+				label: "Node.js version",
+				message: "Which version of Node.js should be targeted?",
+				initial: "14",
+				choices: ["12", "14", "16"],
+				resultTransform: (val) => parseInt(val as string, 10),
 			},
 			styledMultiselect({
-				name: "features",
-				label: "Features",
-				message: "Which features should your project contain?",
-				initial: [0],
-				choices: [
-					{ message: "Adapter", value: "adapter" },
-					{ message: "Visualization", value: "vis" },
-				],
-				action: checkMinSelections.bind(undefined, "feature", 1),
-			}),
-			styledMultiselect({
-				condition: { name: "features", contains: "adapter" },
-				name: "adminFeatures",
-				label: "Admin Features",
-				expert: true,
-				message:
-					"Which additional features should be available in the admin?",
-				hint: "(optional)",
-				initial: [],
-				choices: [
-					{ message: "An extra tab", value: "tab" },
-					{ message: "Custom options for states", value: "custom" },
-				],
-			}),
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "type",
-				label: "Adapter Type",
-				message: "Which category does your adapter fall into?",
-				choices: [
-					{
-						message:
-							"Alarm / security         (Home, car, boat, ...)",
-						value: "alarm",
-					},
-					{
-						message:
-							"Calendars                (also schedules, etc., ...)",
-						value: "date-and-time",
-					},
-					{
-						message:
-							"Cars / Vehicles          (trip information, vehicle status, aux. heating, ...)",
-						value: "vehicle",
-					},
-					{
-						message:
-							"Climate control          (A/C, Heaters, air filters, ...)",
-						value: "climate-control",
-					},
-					{
-						message: "Communication protocols  (MQTT, ...)",
-						value: "protocols",
-					},
-					{
-						message:
-							"Data storage             (SQL/NoSQL, file storage, logging, ...)",
-						value: "storage",
-					},
-					{
-						message:
-							"Data transmission        (for other services via REST api, websockets, ...)",
-						value: "communication",
-					},
-					{
-						message:
-							"Garden                   (Mowers, watering, ...)",
-						value: "garden",
-					},
-					{
-						message:
-							"General purpose          (like admin, web, discovery, ...)",
-						value: "general",
-					},
-					{
-						message:
-							"Geo positioning          (transmission and receipt of position data)",
-						value: "geoposition",
-					},
-					{
-						message:
-							"Hardware                 (low-level, multi-purpose)",
-						value: "hardware",
-					},
-					{
-						message:
-							"Health                   (Fitness sensors, weight, pulse, ...)",
-						value: "health",
-					},
-					{
-						message:
-							"Household devices        (Vacuums, kitchen, ...)",
-						value: "household",
-					},
-					{ message: "Lighting control", value: "lighting" },
-					{
-						message:
-							"Logic                    (Scripts, rules, parsers, scenes, ...)",
-						value: "logic",
-					},
-					{
-						message:
-							"Messaging                (E-Mail, Telegram, WhatsApp, ...)",
-						value: "messaging",
-					},
-					{
-						message: "Meters for energy, electricity, ...",
-						value: "energy",
-					},
-					{
-						message: "Meters for water, gas, oil, ...",
-						value: "metering",
-					},
-					{
-						message:
-							"Miscellaneous data       (Import/export of contacts, gasoline prices, ...)",
-						value: "misc-data",
-					},
-					{
-						message:
-							"Miscellaneous utilities  (Data import/emport, backup, ...)",
-						value: "utility",
-					},
-					{
-						message:
-							"Multimedia               (TV, audio, remote controls, ...)",
-						value: "multimedia",
-					},
-					{
-						message:
-							"Network infrastructure   (Hardware, printers, phones, ...)",
-						value: "infrastructure",
-					},
-					{
-						message:
-							"Network utilities        (Ping, UPnP, network discovery, ...)",
-						value: "network",
-					},
-					{
-						message:
-							"Smart home systems       (3rd party, hardware and software)",
-						value: "iot-systems",
-					},
-					{
-						message:
-							"Visualizations           (VIS, MaterialUI, mobile views, ...)",
-						value: "visualization",
-					},
-					// visualization-icons and visualization-widgets are a separate question for
-					// VIS projects
-					{
-						message:
-							"Weather                  (Forecast, air quality, statistics, ...)",
-						value: "weather",
-					},
-				],
-			},
-			{
-				condition: { name: "features", contains: "vis" },
-				type: "select",
-				name: "type",
-				label: "VIS Type",
-				message: "Which kind of visualization is this?",
-				choices: [
-					{ message: "Icons for VIS", value: "visualization-icons" },
-					{ message: "VIS widgets", value: "visualization-widgets" },
-				],
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "startMode",
-				label: "Start Mode",
-				expert: true,
-				message: "When should the adapter be started?",
-				initial: "daemon",
-				choices: [
-					{
-						message: "always",
-						hint: dim.gray("(recommended for most adapters)"),
-						value: "daemon",
-					},
-					{
-						message: `when the ".alive" state is true`,
-						value: "subscribe",
-					},
-					{ message: "depending on a schedule", value: "schedule" },
-					{
-						message: "when the instance object changes",
-						value: "once",
-					},
-					{ message: "never", value: "none" },
-				],
-			},
-			{
-				condition: { name: "startMode", value: "schedule" },
-				type: "select",
-				name: "scheduleStartOnChange",
-				label: "Schedule",
-				expert: true,
-				message:
-					"Should the adapter also be started when the configuration is changed?",
-				initial: "no",
-				choices: ["yes", "no"],
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "connectionType",
-				label: "Connection Type",
-				optional: true, // We cannot assume this when creating templates
-				message: `From where will the adapter get its data?`,
-				choices: [
-					{ message: "Website or cloud service", value: "cloud" },
-					{
-						message: "Local network or wireless",
-						value: "local",
-					},
-				],
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "dataSource",
-				label: "Data Source",
-				optional: true, // We cannot assume this when creating templates
-				message: `How will the adapter receive its data?`,
-				choices: [
-					{
-						message:
-							"Request it regularly from the service or device",
-						value: "poll",
-					},
-					{
-						message:
-							"The service or device actively sends new data",
-						value: "push",
-					},
-					{
-						message: "Assumption or educated guess",
-						hint: "(e.g. when receiving incomplete events)",
-						value: "assumption",
-					},
-				],
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "connectionIndicator",
-				label: "Show Connection Indicator",
-				expert: true,
-				message: `Do you want to indicate the connection state?`,
-				hint: "(To some device or some service)",
-				initial: "no",
-				choices: ["yes", "no"],
-			},
-		],
-	},
-	{
-		title: "Settings",
-		headline: "Define the settings for the adapter",
-		questions: [
-			{
-				condition: [
-					{ name: "features", contains: "adapter" },
-					{ name: "cli", value: false },
-				],
-				type: "web_unknown" as any, // TODO: give this a good type
-				name: "adapterSettings",
-				label: "Adapter Settings",
-				message: "Define the settings for the adapter",
-				hint: "(optional)",
-				optional: true,
-			},
-		],
-	},
-	{
-		title: "Code",
-		headline: "Some more questions about the source code...",
-		questions: [
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "language",
-				label: "Programming Language",
-				message:
-					"Which language do you want to use to code the adapter?",
-				choices: ["JavaScript", "TypeScript"],
-			},
-			{
-				condition: [{ name: "features", contains: "adapter" }],
-				type: "select",
-				name: "adminReact",
-				label: "Admin with React",
-				message: "Use React for the Admin UI?",
-				initial: "no",
-				choices: ["yes", "no"],
-			},
-			{
-				condition: [{ name: "adminFeatures", contains: "tab" }],
-				type: "select",
-				name: "tabReact",
-				label: "Tab with React",
-				message: "Use React for the tab UI?",
-				initial: "no",
-				choices: ["yes", "no"],
-			},
-			styledMultiselect({
-				condition: { name: "language", value: "JavaScript" },
 				name: "tools",
 				label: "Tools",
 				message: "Which of the following tools do you want to use?",
 				initial: [0, 1],
 				choices: [
 					{ message: "ESLint", hint: "(recommended)" },
-					{ message: "type checking", hint: "(recommended)" },
-					{
-						message: "devcontainer",
-						hint: "(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
-					},
-				],
-			}),
-			styledMultiselect({
-				condition: { name: "language", value: "TypeScript" },
-				name: "tools",
-				label: "Tools",
-				message: "Which of the following tools do you want to use?",
-				initial: [0],
-				choices: [
-					{ message: "ESLint", hint: "(recommended)" },
 					{
 						message: "Prettier",
-						hint: "(requires ESLint, enables automatic code formatting in VSCode)",
-					},
-					{ message: "code coverage" },
-					{
-						message: "devcontainer",
-						hint: "(Requires VSCode and Docker, starts a fresh ioBroker in a Docker container with only your adapter installed)",
+						hint: "(requires ESLint, recommended)",
 					},
 				],
 				action: checkTypeScriptTools,
@@ -525,37 +179,12 @@ export const questionGroups: QuestionGroup[] = [
 				name: "releaseScript",
 				label: "Release Script",
 				message:
-					"Would you like to automate new releases with one simple command?",
+					"Would you like to use @alcalzone/release-script to automate releases?",
 				initial: "yes",
 				choices: ["yes", "no"],
+				resultTransform: makeBool,
 			},
 			{
-				condition: [
-					{ name: "features", contains: "adapter" },
-					{ name: "cli", value: true },
-				],
-				type: "select",
-				name: "devServer",
-				label: "ioBroker dev-server",
-				optional: true,
-				message:
-					"Would you like to use dev-server to develop and test your code with a simple command line tool?",
-				initial: "yes",
-				choices: ["yes", "no"],
-			},
-			{
-				condition: { name: "devServer", contains: "yes" },
-				type: "numeral",
-				name: "devServerPort",
-				label: "dev-server Admin Port",
-				message:
-					"Please choose the port number on which dev-server should present the admin web interface:",
-				initial: 8081,
-				min: 1024,
-				max: 0xffff,
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
 				type: "select",
 				name: "indentation",
 				label: "Indentation",
@@ -564,34 +193,12 @@ export const questionGroups: QuestionGroup[] = [
 				choices: ["Tab", "Space (4)"],
 			},
 			{
-				condition: { name: "features", contains: "adapter" },
 				type: "select",
 				name: "quotes",
 				label: "Quotes",
 				message: "Do you prefer double or single quotes?",
 				initial: "double",
 				choices: ["double", "single"],
-			},
-			{
-				condition: { name: "features", contains: "adapter" },
-				type: "select",
-				name: "es6class",
-				label: "ES6 Class",
-				expert: true,
-				message: "How should the main adapter file be structured?",
-				initial: "yes",
-				choices: [
-					{
-						message: "As an ES6 class",
-						hint: "(recommended)",
-						value: "yes",
-					},
-					{
-						message: "With some methods",
-						hint: "(like legacy code)",
-						value: "no",
-					},
-				],
 			},
 		],
 	},
@@ -647,6 +254,7 @@ export const questionGroups: QuestionGroup[] = [
 				message: "Initialize the GitHub repo automatically?",
 				initial: "no",
 				choices: ["yes", "no"],
+				resultTransform: makeBool,
 			},
 			{
 				type: "select",
@@ -670,11 +278,11 @@ export const questionGroups: QuestionGroup[] = [
 				name: "dependabot",
 				label: "Dependabot",
 				expert: true,
-				message:
-					"Do you want to receive regular dependency updates through Pull Requests?",
+				message: "Do you want to enable Dependabot?",
 				hint: "(recommended)",
 				initial: "no",
 				choices: ["yes", "no"],
+				resultTransform: makeBool,
 			},
 		],
 	},
@@ -685,88 +293,26 @@ export const questions = questionGroups
 	.map((q) => q.questions)
 	.reduce((arr, next) => arr.concat(...next), []);
 
-export interface BaseAdapterSettings<T> {
-	key: string;
-	label?: string;
-	defaultValue?: T;
-}
-export interface StringAdapterSettings extends BaseAdapterSettings<string> {
-	inputType: "text";
-}
-export interface NumberAdapterSettings extends BaseAdapterSettings<number> {
-	inputType: "number";
-}
-export interface BooleanAdapterSettings extends BaseAdapterSettings<boolean> {
-	inputType: "checkbox";
-}
-
-export interface AdapterSelectOption {
-	value: string;
-	text: string;
-}
-
-export interface SelectAdapterSettings extends BaseAdapterSettings<string> {
-	inputType: "select";
-	options: AdapterSelectOption[];
-}
-export type AdapterSettings =
-	| StringAdapterSettings
-	| NumberAdapterSettings
-	| BooleanAdapterSettings
-	| SelectAdapterSettings;
-
-/**
- * An icon in binary or base64-encoded format.
- */
-export interface UploadedIcon {
-	/** The data icon in binary or base64-encoded format. */
-	data: string | Buffer;
-	/** The file extension to use with the icon. */
-	extension: string;
-}
-
 export interface Answers {
-	adapterName: string;
+	projectName: string;
 	description?: string;
 	keywords?: string[];
-	expert?: "yes" | "no";
+
+	packageManager: "npm" | "yarn";
+	nodeVersion: 12 | 14 | 16;
+
+	tools: ("ESLint" | "Prettier")[];
+	releaseScript: boolean;
+	indentation?: "Tab" | "Space (4)";
+	quotes?: "single" | "double";
+
 	authorName: string;
 	authorEmail: string;
 	authorGithub: string;
-	contributors?: string[];
-	language?: "JavaScript" | "TypeScript";
-	features: ("adapter" | "vis")[];
-	adminFeatures?: ("tab" | "custom")[];
-	tools?: (
-		| "ESLint"
-		| "Prettier"
-		| "type checking"
-		| "code coverage"
-		| "devcontainer"
-	)[];
-	ecmaVersion?: 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
-	title?: string;
-	license?: string;
-	type: string;
-	adminReact?: "yes" | "no";
-	tabReact?: "yes" | "no";
-	releaseScript?: "yes" | "no";
-	devServer?: "yes" | "no";
-	devServerPort?: number;
-	indentation?: "Tab" | "Space (4)";
-	quotes?: "single" | "double";
-	es6class?: "yes" | "no";
 	gitRemoteProtocol: "HTTPS" | "SSH";
-	gitCommit?: "yes" | "no";
-	dependabot?: "yes" | "no";
-	startMode?: "daemon" | "schedule" | "subscribe" | "once" | "none";
-	scheduleStartOnChange?: "yes" | "no";
-	connectionIndicator?: "yes" | "no";
-	connectionType?: "cloud" | "local";
-	dataSource?: "poll" | "push" | "assumption";
-	icon?: UploadedIcon;
-	/** An array of predefined adapter options */
-	adapterSettings?: AdapterSettings[];
+	gitCommit?: boolean;
+	license: string;
+	dependabot: boolean;
 }
 
 export function checkAnswers(answers: Partial<Answers>): void {
@@ -840,24 +386,7 @@ export function getDefaultAnswer<T extends keyof Answers>(
 	// Apparently, it is not possible to make the return type depend on the
 	// given object key: https://github.com/microsoft/TypeScript/issues/31672
 	// So we cast to `any` until a solution emerges
-	if (key === "adapterSettings") {
-		return [
-			{
-				key: "option1",
-				defaultValue: true,
-				inputType: "checkbox",
-			},
-			{
-				key: "option2",
-				defaultValue: "42",
-				inputType: "text",
-			},
-		] as any;
-	} else if (key === "keywords") {
-		return ["ioBroker", "template", "Smart Home", "home automation"] as any;
+	if (key === "keywords") {
+		return [] as any;
 	}
-}
-
-export function getIconName(answers: Answers): string {
-	return `${answers.adapterName}.${answers.icon?.extension || "png"}`;
 }

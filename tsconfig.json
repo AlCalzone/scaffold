@@ -27,7 +27,7 @@
 	},
 	"include": [
 		"**/*.ts",
-		".github/*.ts"
+		".github/*.ts",
 	],
 	"exclude": [
 		"build/**",

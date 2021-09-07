@@ -5,6 +5,12 @@
 		"noEmit": false,
 		"declaration": true
 	},
-	"include": ["src/**/*.ts", "templates/**/*.ts", "index.ts", "core.ts"],
-	"exclude": ["src/**/*.test.ts", "templates/**/*.raw.*"]
+	"include": [
+		"src/**/*.ts",
+		"templates/**/*.ts"
+	],
+	"exclude": [
+		"src/**/*.test.ts",
+		"templates/**/*.raw.*"
+	]
 }

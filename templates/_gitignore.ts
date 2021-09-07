@@ -2,7 +2,7 @@ import type { TemplateFunction } from "../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 
-	const useNyc = answers.tools && answers.tools.indexOf("code coverage") > -1;
+	const useYarn = answers.packageManager==="yarn";
 
 	const template = `
 # No dot-directories except github/vscode
@@ -14,18 +14,26 @@ const templateFunction: TemplateFunction = answers => {
 node_modules
 nbproject
 
-# npm package files
-iobroker.*.tgz
+# Unneeded package files
+${useYarn ? (
+`.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+package-lock.json`) : (
+`yarn.lock`)}
+*.tgz
 
+# Compiled source files
+**/build
+**/*.tsbuildinfo
+*.map
+
+# Windows stuff
 Thumbs.db
-${useNyc ? `
-# NYC coverage files
-coverage
-
-` : ""}
-# i18n intermediate files
-admin/i18n/flat.txt
-admin/i18n/*/flat.txt
 `;
 	return template.trim();
 };

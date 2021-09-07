@@ -2,8 +2,7 @@ import { readFile, TemplateFunction } from "../../src/lib/projectGen";
 
 const templateFunction: TemplateFunction = answers => {
 	
-	const useDependabot = answers.dependabot === "yes";
-	if (!useDependabot) return;
+	if (!answers.dependabot) return;
 
 	return readFile("auto-merge.raw.yml", __dirname);
 };

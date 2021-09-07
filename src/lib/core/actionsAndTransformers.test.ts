@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 import {
-	checkAdapterName,
 	checkAuthorName,
 	checkEmail,
 	checkMinSelections,
+	checkProjectName,
 	CheckResult,
 	transformDescription,
 } from "./actionsAndTransformers";
@@ -34,7 +34,7 @@ describe("actionsAndTransformers/checkAdapterName()", () => {
 	it("should not accept empty names", async () => {
 		const forbiddenNames = ["", " ", "\t"];
 		for (const name of forbiddenNames) {
-			const result = await checkAdapterName(name);
+			const result = await checkProjectName(name);
 			result.should.be.a("string").and.match(/Please enter/);
 		}
 	});
@@ -42,7 +42,7 @@ describe("actionsAndTransformers/checkAdapterName()", () => {
 	it(`should only accept lowercase letters, numbers, "-" and "_"`, async () => {
 		const forbiddenNames = ["ö", "$", "foo/bar", "FOO"];
 		for (const name of forbiddenNames) {
-			const result = await checkAdapterName(name);
+			const result = await checkProjectName(name);
 			result.should.be.a("string").and.match(/may only consist/);
 		}
 	});
@@ -50,7 +50,7 @@ describe("actionsAndTransformers/checkAdapterName()", () => {
 	it(`should only accept names that start with a letter`, async () => {
 		const forbiddenNames = ["1baz", "_foo", "---123b"];
 		for (const name of forbiddenNames) {
-			const result = await checkAdapterName(name);
+			const result = await checkProjectName(name);
 			result.should.be.a("string").and.match(/must start with/);
 		}
 	});
@@ -58,13 +58,13 @@ describe("actionsAndTransformers/checkAdapterName()", () => {
 	it(`should only accept names that end with a letter or number`, async () => {
 		const forbiddenNames = ["abc-", "foo-bar-_"];
 		for (const name of forbiddenNames) {
-			const result = await checkAdapterName(name);
+			const result = await checkProjectName(name);
 			result.should.be.a("string").and.match(/must end with/);
 		}
 	});
 
 	it("should return true otherwise", async () => {
-		await checkAdapterName("foo").should.become(true);
+		await checkProjectName("foo").should.become(true);
 	});
 });
 

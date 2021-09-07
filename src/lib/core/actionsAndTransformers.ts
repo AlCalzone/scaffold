@@ -13,7 +13,7 @@ export async function checkMinSelections(
 	return `Please enter at least ${min} ${category}`;
 }
 
-function isAdapterNameValid(name: string): CheckResult {
+function isProjectNameValid(name: string): CheckResult {
 	if (!isNotEmpty(name)) {
 		return "Please enter a valid name!";
 	}
@@ -30,8 +30,8 @@ function isAdapterNameValid(name: string): CheckResult {
 	return true;
 }
 
-export function checkAdapterName(name: string): CheckResult {
-	const validCheck = isAdapterNameValid(name);
+export function checkProjectName(name: string): CheckResult {
+	const validCheck = isProjectNameValid(name);
 	if (typeof validCheck === "string") return validCheck;
 	return true;
 }
@@ -89,4 +89,8 @@ export function transformContributors(
 		.filter((c) => !!c);
 	if (contributorsArray.length === 0) return undefined;
 	return contributorsArray;
+}
+
+export function makeBool(answer: string): boolean {
+	return answer === "yes";
 }
