@@ -176,6 +176,24 @@ export const questionGroups: QuestionGroup[] = [
 			}),
 			{
 				type: "select",
+				name: "testing",
+				label: "Testing framework",
+				message: "Which testing framework do you want to use?",
+				initial: "jest",
+				choices: [
+					{
+						message: "Jest",
+						value: "jest",
+					},
+					{
+						message: "Mocha (w/ Sinon and Chai)",
+						value: "mocha",
+					},
+					{ message: "None", value: "none" },
+				],
+			},
+			{
+				type: "select",
 				name: "releaseScript",
 				label: "Release Script",
 				message:
@@ -302,6 +320,7 @@ export interface Answers {
 	nodeVersion: 12 | 14 | 16;
 
 	tools: ("ESLint" | "Prettier")[];
+	testing: "jest" | "mocha" | "none";
 	releaseScript: boolean;
 	indentation?: "Tab" | "Space (4)";
 	quotes?: "single" | "double";

@@ -4,6 +4,7 @@ const templateFunction: TemplateFunction = answers => {
 
     // const useTypeScript = true; //answers.language === "TypeScript";
     const useESLint = !!answers.tools?.includes("ESLint");
+	const hasTestFramework = answers.testing !== "none";
 
     const latestNodeVersion = "14.x";
     const nodeMatrix = ["12.x", "14.x", "16.x"];
@@ -92,7 +93,7 @@ ${(osMatrix.includes("windows-latest") && nodeMatrix.includes("8.x")) ? (
               run: ${runcmd} build
 
             - name: Run unit tests
-              run: ${runcmd} test
+              run: ${runcmd} test${hasTestFramework ? ":ci" : ""}
               
 # TODO: To enable automatic npm releases, create a token on npmjs.org 
 # Enter this token as a GitHub secret (with name NPM_TOKEN) in the repository options

@@ -24,38 +24,77 @@ const templateFunction: TemplateFunction = async answers => {
 	const useESLint = !!answers.tools?.includes("ESLint");
 	const usePrettier = !!answers.tools?.includes("Prettier");
 	const useReleaseScript = answers.releaseScript;
+	const useJest = answers.testing === "jest";
+	const useMocha = answers.testing === "mocha";
 
 	const dependencyTasks: string[] = [];
 	const dependencies = await getDependencyEntries(dependencyTasks)
 
-	const devDependencyTasks: string[] =[
+	const devDependencyTasks: string[] = [
 		`@tsconfig/node${answers.nodeVersion}`,
 		`@types/node@${answers.nodeVersion}`,
 		"typescript@~4.4",
 		"rimraf",
-		...(useESLint?["@typescript-eslint/eslint-plugin","@typescript-eslint/parser","eslint"]:[]),
-		...(usePrettier?["eslint-config-prettier","eslint-plugin-prettier","prettier"]:[]),
-		...(useReleaseScript?["@alcalzone/release-script@^2"]:[]),
-	]
-		const devDependencies = await getDependencyEntries(devDependencyTasks);
-
-	const gitUrl = answers.gitRemoteProtocol === "HTTPS"
-		? `https://github.com/${answers.authorGithub}/${answers.projectName}`
-		: `git@github.com:${answers.authorGithub}/${answers.projectName}.git`;
-
+		"source-map-support",
+		"ts-node",
+		...(useESLint
+			? [
+				"@typescript-eslint/eslint-plugin",
+				"@typescript-eslint/parser",
+				"eslint",
+			]
+			: []),
+		...(usePrettier
+			? ["eslint-config-prettier", "eslint-plugin-prettier", "prettier"]
+			: []),
+		...(useReleaseScript ? ["@alcalzone/release-script@^2"] : []),
+		...(useJest ? [
+			"@babel/cli",
+			"@babel/core",
+			"@babel/preset-env",
+			"@babel/preset-typescript",
+			"@types/jest",
+			"jest",
+			"jest-extended",
+		] : []),
+		...(useMocha ? [
+			"@types/chai",
+			"@types/chai-as-promised",
+			"@types/mocha",
+			"@types/sinon",
+			"@types/sinon-chai",
+			"chai",
+			"chai-as-promised",
+			"mocha",
+			"sinon",
+			"sinon-chai",			
+		] : []),
+	];
+	const devDependencies = await getDependencyEntries(devDependencyTasks);
+	
+	const gitUrl =
+		answers.gitRemoteProtocol === "HTTPS"
+			? `https://github.com/${answers.authorGithub}/${answers.projectName}`
+			: `git@github.com:${answers.authorGithub}/${answers.projectName}.git`;
+	
 	// Generate whitelist for package files
-	const packageFiles = [
-		"LICENSE",
-		...(useTypeScript ? ["build/"] : []),
-	].sort((a, b) => {
-		// Put directories on top
-		const isDirA = a.includes("/");
-		const isDirB = b.includes("/");
-		if (isDirA && !isDirB) return -1;
-		if (isDirB && !isDirA) return 1;
-		return a.localeCompare(b);
-	});
+	const packageFiles = ["LICENSE", ...(useTypeScript ? ["build/"] : [])].sort(
+		(a, b) => {
+			// Put directories on top
+			const isDirA = a.includes("/");
+			const isDirB = b.includes("/");
+			if (isDirA && !isDirB) return -1;
+			if (isDirB && !isDirA) return 1;
+			return a.localeCompare(b);
+		}
+	);
 
+	const getRunScriptCmd = (scriptName: string, runArgs?: string): string => {
+		return `${answers.packageManager === "yarn" ? "yarn" : "npm run"
+			} ${scriptName}${answers.packageManager === "npm" && !!runArgs ? " --" : ""}${!!runArgs ? ` ${runArgs}` : ""
+			}`;
+	};
+	
 	const template = `
 {
 	"name": "${answers.projectName.toLowerCase()}",
@@ -76,7 +115,20 @@ const templateFunction: TemplateFunction = async answers => {
 		"prebuild": "rimraf ./build",
 		"build": "tsc -p tsconfig.build.json",
 		"watch": "tsc -p tsconfig.build.json --watch",
-		"test": "echo \\"No tests defined!\\" && exit 1",
+		${useJest ? (`
+			"test:reset": "jest --clear-cache",
+			"test:ts": "jest",
+			"test:ci": "${getRunScriptCmd("test:ts", "--runInBand")}",
+			"test": "${getRunScriptCmd("test:ts", "--watch")}",
+			"coverage:ci": "${getRunScriptCmd("test:ci", "--collect-coverage")}",
+			"coverage": "${getRunScriptCmd("test:ts", "--collect-coverage")}",
+		`) : useMocha ? (`
+			"test:ts": "mocha src/**/*.test.ts",
+			"test:ci": "${getRunScriptCmd("test:ts")}",
+			"test": "${getRunScriptCmd("test:ts", "--watch")}",
+		`) : (`
+			"test": "echo \\"No tests defined!\\" && exit 1",
+		`)}
 		${useESLint ? (`
 			"lint": "eslint --ext .ts src/",
 		`) : ""}
