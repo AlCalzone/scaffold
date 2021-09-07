@@ -3,6 +3,7 @@ import type { TemplateFunction } from "../src/lib/scaffold";
 const templateFunction: TemplateFunction = answers => {
 
 	if (answers.testing !== "mocha") return;
+	const isMonorepo = answers.monorepo;
 
 	const template = `
 {
@@ -11,7 +12,7 @@ const templateFunction: TemplateFunction = answers => {
 		"ts-node/register",
 		"source-map-support/register"
 	],
-	"watch-files": ["src/**/*.test.ts"]
+	"watch-files": ["${isMonorepo ? "packages/*/" : ""}src/**/*.test.ts"]
 }
 `;
 	return template.trim();

@@ -28,6 +28,8 @@ const templateFunction: TemplateFunction = async answers => {
 	const useJest = answers.testing === "jest";
 	const useMocha = answers.testing === "mocha";
 
+	const isMonorepo = answers.monorepo;
+
 	const dependencyTasks: string[] = [];
 	const dependencies = await getDependencyEntries(dependencyTasks)
 
@@ -76,6 +78,7 @@ const templateFunction: TemplateFunction = async answers => {
 			"sinon",
 			"sinon-chai",			
 		] : []),
+		...(isMonorepo ? ["lerna"] : []),
 	];
 	const devDependencies = await getDependencyEntries(devDependencyTasks);
 	
@@ -85,7 +88,10 @@ const templateFunction: TemplateFunction = async answers => {
 			: `git@github.com:${answers.authorGithub}/${answers.projectName}.git`;
 	
 	// Generate whitelist for package files
-	const packageFiles = ["LICENSE", ...(useTypeScript ? ["build/"] : [])].sort(
+	const packageFiles = [
+		"LICENSE",
+		...(useTypeScript ? ["build/"] : [])
+	].sort(
 		(a, b) => {
 			// Put directories on top
 			const isDirA = a.includes("/");
@@ -104,24 +110,36 @@ const templateFunction: TemplateFunction = async answers => {
 	
 	const template = `
 {
-	"name": "${answers.projectName.toLowerCase()}",
+	"name": "${isMonorepo ? "@" : ""}${answers.projectName.toLowerCase()}${isMonorepo ? "/repo" : ""}",
 	"version": "0.0.1",
 	"description": "${answers.description || answers.projectName}",
 	"keywords": ${JSON.stringify(answers.keywords || getDefaultAnswer("keywords"))},
 	"license": "${licenses[answers.license!].id}",
-	"main": "build/index.js",
-	"types": "build/index.d.ts",
-	"files": ${JSON.stringify(packageFiles)},
 	"author": {
 		"name": "${answers.authorName}",
 		"email": "${answers.authorEmail}",
 	},
+	${isMonorepo ? (`
+		"private": true,
+		"workspaces": [
+			"packages/*"
+		],	
+	`) : (`
+		"main": "build/index.js",
+		"types": "build/index.d.ts",
+		"files": ${JSON.stringify(packageFiles)},
+	`)}
 	"dependencies": {${dependencies.join(",")}},
 	"devDependencies": {${devDependencies.join(",")}},
 	"scripts": {
-		"prebuild": "rimraf ./build",
-		"build": "tsc -p tsconfig.build.json",
-		"watch": "tsc -p tsconfig.build.json --watch",
+		${isMonorepo ? (`
+			"build": "lerna run build",
+			"watch": "lerna run watch",
+		`) : (`
+			"prebuild": "rimraf ./build",
+			"build": "tsc -p tsconfig.build.json",
+			"watch": "tsc -p tsconfig.build.json --watch",
+		`)}
 		${useJest ? (`
 			"test:reset": "jest --clear-cache",
 			"test:ts": "jest",
@@ -130,18 +148,26 @@ const templateFunction: TemplateFunction = async answers => {
 			"coverage:ci": "${getRunScriptCmd("test:ci", "--collect-coverage")}",
 			"coverage": "${getRunScriptCmd("test:ts", "--collect-coverage")}",
 		`) : useMocha ? (`
-			"test:ts": "mocha src/**/*.test.ts",
+			"test:ts": "mocha \\"${isMonorepo ? "packages/*/" : ""}src/**/*.test.ts\\"",
 			"test:ci": "${getRunScriptCmd("test:ts")}",
 			"test": "${getRunScriptCmd("test:ts", "--watch")}",
 		`) : (`
 			"test": "echo \\"No tests defined!\\" && exit 1",
 		`)}
 		${useESLint ? (`
-			"lint": "eslint --ext .ts src/",
+			"lint": "eslint --ext .ts ${isMonorepo ? `\\"packages/*/src/**/*.ts\\"` : "src/"}",
 		`) : ""}
-		${useReleaseScript ? (`
-			"release": "release-script",
-		`) : ""}
+		${useReleaseScript ? (
+			isMonorepo
+				? (`
+					"release": "lerna version",
+					"preversion": "release-script --lerna-check",
+					"version": "release-script --lerna",
+					"postversion": "git push && git push --tags",
+				`) : (`
+					"release": "release-script",
+				`)
+		) : ""}
 		${useCommitlint ? (`
 			"commit": "git-cz",
 			"postinstall": "husky install",
@@ -164,6 +190,7 @@ const templateFunction: TemplateFunction = async answers => {
 		}
 	`) : ""}
 }`;
+
 	return JSON.stringify(JSON5.parse(template), null, 2);
 };
 

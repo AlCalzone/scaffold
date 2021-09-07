@@ -91,6 +91,7 @@ export function transformContributors(
 	return contributorsArray;
 }
 
-export function makeBool(answer: string): boolean {
+export function makeBool(answer: string | boolean): boolean {
+	if (typeof answer === "boolean") return answer;
 	return answer === "yes";
 }

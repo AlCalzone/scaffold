@@ -227,6 +227,7 @@ async function setupProject_CLI(
 					: "npm run build"
 			).split(" ");
 			await execa(cmd, args, {
+				cwd: targetDir,
 				stdout: "ignore",
 			});
 		}
@@ -255,6 +256,7 @@ async function setupProject_CLI(
 	}
 
 	console.log();
+	console.log(`Project created in ${targetDir}`);
 	console.log(blueBright("All done! Have fun programming! ") + red("♥"));
 }
 

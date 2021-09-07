@@ -3,12 +3,13 @@ import type { TemplateFunction } from "../../src/lib/scaffold";
 const templateFunction: TemplateFunction = answers => {
 
 	if (answers.testing !== "mocha") return;
+	const isMonorepo = answers.monorepo;
 
 	const template = `
 // Makes ts-node ignore warnings, so mocha --watch does work
 process.env.TS_NODE_IGNORE_WARNINGS = "TRUE";
 // Sets the correct tsconfig for testing
-process.env.TS_NODE_PROJECT = "tsconfig.json";
+process.env.TS_NODE_PROJECT = "tsconfig${isMonorepo ? ".test" : ""}.json";
 
 // Don't silently swallow unhandled rejections
 process.on("unhandledRejection", (e) => {

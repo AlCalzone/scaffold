@@ -1,0 +1,11 @@
+// Specialized tsconfig used for linting
+{
+	"extends": "./tsconfig.json",
+	"include": [
+		"**/*.ts"
+	],
+	"exclude": [
+		"**/build/**",
+		"**/node_modules/**"
+	]
+}

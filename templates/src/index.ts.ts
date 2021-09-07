@@ -1,6 +1,8 @@
 import type { TemplateFunction } from "../../src/lib/scaffold";
 
-export = (_answers => {
+export = (answers => {
+
+	if (answers.monorepo) return;
 
 	const template = `
 console.log("Hello World!");

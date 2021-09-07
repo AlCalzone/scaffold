@@ -28,9 +28,12 @@ async function generateBaselines(
 
 	// Include the npm package content in the baselines (only for full adapter tests)
 	if (!filterFilesPredicate && files.some((f) => f.name === "package.json")) {
+		const packTestDir = answers.monorepo
+			? path.join(testDir, "packages", answers.monorepoPackageName!)
+			: testDir;
 		let packageContent = (
 			await execa("npm", ["pack", "--dry-run"], {
-				cwd: testDir,
+				cwd: packTestDir,
 				encoding: "utf8",
 			})
 		).stderr
@@ -77,6 +80,7 @@ const baseAnswers: Answers = {
 	nodeVersion: 14,
 
 	tools: ["ESLint", "Prettier", "Commitlint"],
+	monorepo: false,
 	testing: "jest",
 	releaseScript: true,
 	indentation: "Tab",
@@ -193,6 +197,15 @@ describe("adapter creation =>", () => {
 					testing: "none",
 				};
 				await expectSuccess("no_testing", answers);
+			});
+
+			it("Monorepo", async () => {
+				const answers: Answers = {
+					...baseAnswers,
+					monorepo: true,
+					monorepoPackageName: "package-1",
+				};
+				await expectSuccess("monorepo", answers);
 			});
 
 			// it("Adapter, TypeScript (ES6 class), ESLint, Tabs, Double quotes, MIT License", async () => {

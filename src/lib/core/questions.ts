@@ -153,6 +153,23 @@ export const questionGroups: QuestionGroup[] = [
 			},
 			{
 				type: "select",
+				name: "monorepo",
+				label: "Monorepo",
+				message: "Should the project be a monorepo (using lerna)?",
+				initial: "no",
+				choices: ["yes", "no"],
+				resultTransform: makeBool,
+			},
+			{
+				condition: { name: "monorepo", value: true },
+				type: "input",
+				name: "monorepoPackageName",
+				label: "Monorepo: 1st package name",
+				message: "Please enter the name of the first monorepo package:",
+				action: checkProjectName,
+			},
+			{
+				type: "select",
 				name: "nodeVersion",
 				label: "Node.js version",
 				message: "Which version of Node.js should be targeted?",
@@ -318,6 +335,8 @@ export interface Answers {
 	keywords?: string[];
 
 	packageManager: "npm" | "yarn";
+	monorepo: boolean;
+	monorepoPackageName?: string;
 	nodeVersion: 12 | 14 | 16;
 
 	tools: ("ESLint" | "Prettier" | "Commitlint")[];

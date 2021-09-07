@@ -12,6 +12,7 @@ const templateFunction: TemplateFunction = answers => {
 
     const pm = answers.packageManager;
     const runcmd = answers.packageManager === "yarn" ? "yarn" : "npm run";
+	const isMonorepo = answers.monorepo;
 
     const template = `
 name: Test and Release
@@ -51,7 +52,7 @@ ${useESLint ? (
                   cache: '${pm}'
 
             - name: Install Dependencies
-              run: ${pm === "yarn" ? "yarn install --immutable" : "npm ci"}
+              run: ${pm === "yarn" ? "yarn install --prefer-offline --frozen-lockfile" : "npm ci"}
 
             - name: Compile TypeScript code
               run: ${runcmd} build
@@ -87,7 +88,7 @@ ${(osMatrix.includes("windows-latest") && nodeMatrix.includes("8.x")) ? (
                   cache: '${pm}'
 
             - name: Install Dependencies
-              run: ${pm === "yarn" ? "yarn install --immutable" : "npm ci"}
+              run: ${pm === "yarn" ? "yarn install --prefer-offline --frozen-lockfile" : "npm ci"}
 
             - name: Compile TypeScript code
               run: ${runcmd} build
@@ -138,7 +139,7 @@ ${(osMatrix.includes("windows-latest") && nodeMatrix.includes("8.x")) ? (
 #                  echo "::set-output name=BODY::$BODY"
 #
 #            - name: Install Dependencies
-#              run: ${pm === "yarn" ? "yarn install --immutable" : "npm ci"}
+#              run: ${pm === "yarn" ? "yarn install --prefer-offline --frozen-lockfile" : "npm ci"}
 #
 #            - name: Create a clean build
 #              run: ${runcmd} build
@@ -147,7 +148,9 @@ ${(osMatrix.includes("windows-latest") && nodeMatrix.includes("8.x")) ? (
 #              run: |
 #                  npm config set //registry.npmjs.org/:_authToken=\${{ secrets.NPM_TOKEN }}
 #                  npm whoami
-#                  npm publish
+#                  ${isMonorepo
+						? `${pm === "yarn" ? "yarn" : "npx"} lerna publish from-package --yes`
+						: "npm publish"}
 #
 #            - name: Create Github Release
 #              uses: actions/create-release@v1

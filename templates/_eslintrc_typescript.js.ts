@@ -5,6 +5,7 @@ const templateFunction: TemplateFunction = answers => {
 	const useESLint = answers.tools && answers.tools.indexOf("ESLint") > -1;
 	if (!useESLint) return;
 	const usePrettier = answers.tools && answers.tools.indexOf("Prettier") > -1;
+	const isMonorepo = answers.monorepo;
 
 	const esVersion = {
 		12: 2019,
@@ -19,7 +20,7 @@ module.exports = {
 	parserOptions: {
 		ecmaVersion: ${esVersion[answers.nodeVersion]}, // Allows for the parsing of modern ECMAScript features
 		sourceType: "module", // Allows for the use of imports
-		project: "./tsconfig.json",
+		project: "./tsconfig${isMonorepo ? ".eslint" : ""}.json",
 	},
 	extends: [
 		"plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin

@@ -5,6 +5,8 @@ export = (answers => {
 	const useTypeScript = true; //answers.language === "TypeScript";
 	if (!useTypeScript) return;
 
+	const isMonorepo = answers.monorepo;
+
 	const template = `
 // Root tsconfig to set the settings and power editor support for all TS files
 {
@@ -12,9 +14,15 @@ export = (answers => {
 	// https://github.com/tsconfig/bases#node-${answers.nodeVersion}-tsconfigjson
 	"extends": "@tsconfig/node${answers.nodeVersion}/tsconfig.json",
 	"compilerOptions": {
-		// do not compile anything, this file is just to configure type checking
+		${isMonorepo ? (
+`		// Required for monorepos
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,`) : (
+`		// do not compile anything, this file is just to configure type checking
 		// the compilation is configured in tsconfig.build.json
-		"noEmit": true,
+		"noEmit": true,`)}
+
 		// Never emit faulty JS
 		"noEmitOnError": true,
 
@@ -29,11 +37,22 @@ export = (answers => {
 		"inlineSourceMap": false,
 	},
 	"include": [
-		"**/*.ts",
+		${isMonorepo ? (`
+			"packages/**/src/**/*.ts",
+			"test/**/*.ts"
+		`) : (`
+			"**/*.ts",
+		`)}
 	],
 	"exclude": [
-		"build/**",
-		"node_modules/**"
+		${isMonorepo ? (`
+			"**/build/**",
+			"node_modules/**",
+			"packages/**/node_modules"
+		`) : (`
+			"build/**",
+			"node_modules/**"
+		`)}
 	]
 }`;
 	return template.trim();
