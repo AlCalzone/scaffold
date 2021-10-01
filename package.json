@@ -59,7 +59,7 @@
     "rimraf": "^3.0.2",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.5.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.20"
   },
   "dependencies": {
     "@typescript-eslint/parser": "^4.22.0",
