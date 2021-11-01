@@ -34,7 +34,7 @@
     "@types/ansi-colors": "^3.2.2",
     "@types/chai": "^4.2.19",
     "@types/chai-as-promised": "^7.1.4",
-    "@types/eslint": "^7.28.0",
+    "@types/eslint": "^7.28.2",
     "@types/fs-extra": "^9.0.11",
     "@types/json5": "2.2.0",
     "@types/mocha": "^9.0.0",
