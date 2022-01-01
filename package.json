@@ -65,7 +65,7 @@
     "@typescript-eslint/parser": "^4.33.0",
     "alcalzone-shared": "^4.0.0",
     "ansi-colors": "^4.1.1",
-    "axios": "^0.21.4",
+    "axios": "^0.24.0",
     "enquirer": "^2.3.6",
     "eslint": "^7.32.0",
     "execa": "^5.1.1",
