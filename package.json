@@ -29,7 +29,7 @@
     "node": ">=14"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "^2.2.1",
+    "@alcalzone/release-script": "^2.2.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/ansi-colors": "^3.2.2",
     "@types/chai": "^4.3.0",
@@ -48,7 +48,6 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
-    "colors": "^1.4.0",
     "copyfiles": "^2.2.0",
     "esbuild": "^0.12.25",
     "esbuild-register": "^3.0.0",
