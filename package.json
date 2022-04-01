@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@typescript-eslint/parser": "^4.33.0",
-    "alcalzone-shared": "^4.0.0",
+    "alcalzone-shared": "^4.0.1",
     "ansi-colors": "^4.1.1",
     "axios": "^0.24.0",
     "enquirer": "^2.3.6",
