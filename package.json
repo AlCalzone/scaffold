@@ -49,7 +49,7 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "copyfiles": "^2.2.0",
-    "esbuild": "^0.12.25",
+    "esbuild": "^0.14.29",
     "esbuild-register": "^3.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -58,11 +58,11 @@
     "rimraf": "^3.0.2",
     "sinon": "^12.0.1",
     "sinon-chai": "^3.5.0",
-    "source-map-support": "^0.5.20"
+    "source-map-support": "^0.5.21"
   },
   "dependencies": {
     "@typescript-eslint/parser": "^4.33.0",
-    "alcalzone-shared": "^4.0.0",
+    "alcalzone-shared": "^4.0.1",
     "ansi-colors": "^4.1.1",
     "axios": "^0.24.0",
     "enquirer": "^2.3.6",
