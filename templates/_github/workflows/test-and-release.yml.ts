@@ -81,7 +81,7 @@ ${(osMatrix.includes("windows-latest") && nodeMatrix.includes("8.x")) ? (
             - name: Checkout code
               uses: actions/checkout@v2
 
-              - name: Use Node.js \${{ matrix.node-version }}
+            - name: Use Node.js \${{ matrix.node-version }}
               uses: actions/setup-node@v2
               with:
                   node-version: \${{ matrix.node-version }}
